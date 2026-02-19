@@ -22,11 +22,23 @@ export const authAPI = {
 
 export const eventsAPI = {
   getAll: () => client.get('/events'),
-  create: (name, start_time, end_time) =>
-    client.post('/events', { name, start_time, end_time }),
-  update: (id, name, start_time, end_time) =>
-    client.put(`/events/${id}`, { name, start_time, end_time }),
+  create: (name, start_time, end_time, m3u_entry_id) =>
+    client.post('/events', { name, start_time, end_time, m3u_entry_id }),
+  update: (id, name, start_time, end_time, m3u_entry_id) =>
+    client.put(`/events/${id}`, { name, start_time, end_time, m3u_entry_id }),
   delete: (id) => client.delete(`/events/${id}`),
+};
+
+export const m3uAPI = {
+  getPlaylists: () => client.get('/m3u/playlists'),
+  getEntries: (playlistId) =>
+    client.get('/m3u/entries', { params: { playlistId } }),
+  addPlaylist: (url, name) =>
+    client.post('/m3u/playlists', { url, name }),
+  deletePlaylist: (id) =>
+    client.delete(`/m3u/playlists/${id}`),
+  refreshPlaylist: (id) =>
+    client.post(`/m3u/playlists/${id}/refresh`),
 };
 
 export default client;

@@ -1,18 +1,24 @@
 import { useState, useEffect } from 'react'
 import { eventsAPI } from '../api/client'
+import M3UPlaylists from './M3UPlaylists'
+import PlaylistsManager from './PlaylistsManager'
 import './Schedule.css'
 
 export default function Schedule({ username, onLogout }) {
+  const [activeTab, setActiveTab] = useState('schedule') // 'schedule' or 'playlists'
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [showM3UModal, setShowM3UModal] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     start_time: '',
     end_time: '',
+    m3u_entry_id: null,
   })
+  const [selectedM3UEntry, setSelectedM3UEntry] = useState(null)
 
   useEffect(() => {
     loadEvents()
@@ -36,6 +42,12 @@ export default function Schedule({ username, onLogout }) {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
+  const handleSelectM3UEntry = (entry) => {
+    setSelectedM3UEntry(entry)
+    setFormData(prev => ({ ...prev, m3u_entry_id: entry.id }))
+    setShowM3UModal(false)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -46,9 +58,20 @@ export default function Schedule({ username, onLogout }) {
 
     try {
       if (editingId) {
-        await eventsAPI.update(editingId, formData.name, formData.start_time, formData.end_time)
+        await eventsAPI.update(
+          editingId,
+          formData.name,
+          formData.start_time,
+          formData.end_time,
+          formData.m3u_entry_id
+        )
       } else {
-        await eventsAPI.create(formData.name, formData.start_time, formData.end_time)
+        await eventsAPI.create(
+          formData.name,
+          formData.start_time,
+          formData.end_time,
+          formData.m3u_entry_id
+        )
       }
       resetForm()
       await loadEvents()
@@ -63,9 +86,20 @@ export default function Schedule({ username, onLogout }) {
       name: event.name,
       start_time: event.start_time,
       end_time: event.end_time,
+      m3u_entry_id: event.m3u_entry_id,
     })
+    if (event.m3u_entry_id) {
+      setSelectedM3UEntry({
+        id: event.m3u_entry_id,
+        url: event.entry_url,
+        title: event.m3u_title,
+      })
+    } else {
+      setSelectedM3UEntry(null)
+    }
     setEditingId(event.id)
     setShowForm(true)
+    setShowM3UModal(false)
   }
 
   const handleDelete = async (id) => {
@@ -81,9 +115,16 @@ export default function Schedule({ username, onLogout }) {
   }
 
   const resetForm = () => {
-    setFormData({ name: '', start_time: '', end_time: '' })
+    setFormData({
+      name: '',
+      start_time: '',
+      end_time: '',
+      m3u_entry_id: null,
+    })
+    setSelectedM3UEntry(null)
     setEditingId(null)
     setShowForm(false)
+    setShowM3UModal(false)
     setError('')
   }
 
@@ -101,92 +142,174 @@ export default function Schedule({ username, onLogout }) {
         <button className="logout-btn" onClick={onLogout}>Logout</button>
       </div>
 
-      <div className="schedule-content">
-        <div className="schedule-sidebar">
-          <button
-            className="new-event-btn"
-            onClick={() => {
-              resetForm()
-              setShowForm(true)
-            }}
-          >
-            + New Event
-          </button>
-
-          {showForm && (
-            <div className="form-box">
-              <h2>{editingId ? 'Edit Event' : 'Create Event'}</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label htmlFor="name">Event Name</label>
-                  <input
-                    id="name"
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="e.g., Team Meeting"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="start_time">Start Time</label>
-                  <input
-                    id="start_time"
-                    type="datetime-local"
-                    name="start_time"
-                    value={formData.start_time}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="end_time">End Time</label>
-                  <input
-                    id="end_time"
-                    type="datetime-local"
-                    name="end_time"
-                    value={formData.end_time}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                {error && <div className="error-message">{error}</div>}
-                <div className="form-buttons">
-                  <button type="submit">{editingId ? 'Update' : 'Create'}</button>
-                  <button type="button" onClick={resetForm} className="cancel-btn">Cancel</button>
-                </div>
-              </form>
-            </div>
-          )}
-        </div>
-
-        <div className="schedule-main">
-          <h2>Shared Schedule</h2>
-          {loading ? (
-            <p>Loading events...</p>
-          ) : events.length === 0 ? (
-            <p className="no-events">No events scheduled yet</p>
-          ) : (
-            <div className="events-list">
-              {events.map(event => (
-                <div key={event.id} className="event-card">
-                  <div className="event-info">
-                    <h3>{event.name}</h3>
-                    <p className="event-time">
-                      <span className="time-label">Start:</span> {formatDateTime(event.start_time)}
-                    </p>
-                    <p className="event-time">
-                      <span className="time-label">End:</span> {formatDateTime(event.end_time)}
-                    </p>
-                  </div>
-                  <div className="event-actions">
-                    <button className="edit-btn" onClick={() => handleEdit(event)}>Edit</button>
-                    <button className="delete-btn" onClick={() => handleDelete(event.id)}>Delete</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Tabs */}
+      <div className="tabs-header">
+        <button
+          className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
+          onClick={() => setActiveTab('schedule')}
+        >
+          Schedule
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'playlists' ? 'active' : ''}`}
+          onClick={() => setActiveTab('playlists')}
+        >
+          M3U Playlists
+        </button>
       </div>
+
+      <div className="schedule-content">
+        {/* Schedule Tab */}
+        {activeTab === 'schedule' && (
+          <>
+            <div className="schedule-sidebar">
+              <button
+                className="new-event-btn"
+                onClick={() => {
+                  resetForm()
+                  setShowForm(true)
+                }}
+              >
+                + New Event
+              </button>
+
+              {showForm && (
+                <div className="form-box">
+                  <h2>{editingId ? 'Edit Event' : 'Create Event'}</h2>
+                  <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                      <label htmlFor="name">Event Name</label>
+                      <input
+                        id="name"
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="e.g., Team Meeting"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="start_time">Start Time</label>
+                      <input
+                        id="start_time"
+                        type="datetime-local"
+                        name="start_time"
+                        value={formData.start_time}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="end_time">End Time</label>
+                      <input
+                        id="end_time"
+                        type="datetime-local"
+                        name="end_time"
+                        value={formData.end_time}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+
+                    {/* M3U Entry Selection */}
+                    <div className="form-group">
+                      <label>M3U Entry (Optional)</label>
+                      {selectedM3UEntry ? (
+                        <div className="m3u-selected">
+                          <div className="m3u-selected-title">{selectedM3UEntry.title}</div>
+                          <div className="m3u-selected-url">{selectedM3UEntry.url}</div>
+                          <div className="m3u-selected-actions">
+                            <button
+                              type="button"
+                              className="m3u-change-btn"
+                              onClick={() => setShowM3UModal(true)}
+                            >
+                              Change
+                            </button>
+                            <button
+                              type="button"
+                              className="m3u-clear-btn"
+                              onClick={() => {
+                                setSelectedM3UEntry(null)
+                                setFormData(prev => ({ ...prev, m3u_entry_id: null }))
+                              }}
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="m3u-select-btn"
+                          onClick={() => setShowM3UModal(true)}
+                        >
+                          Select M3U Entry
+                        </button>
+                      )}
+                    </div>
+
+                    {error && <div className="error-message">{error}</div>}
+                    <div className="form-buttons">
+                      <button type="submit">{editingId ? 'Update' : 'Create'}</button>
+                      <button type="button" onClick={resetForm} className="cancel-btn">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+
+            <div className="schedule-main">
+              <h2>Shared Schedule</h2>
+              {loading ? (
+                <p>Loading events...</p>
+              ) : events.length === 0 ? (
+                <p className="no-events">No events scheduled yet</p>
+              ) : (
+                <div className="events-list">
+                  {events.map(event => (
+                    <div key={event.id} className="event-card">
+                      <div className="event-info">
+                        <h3>{event.name}</h3>
+                        <p className="event-time">
+                          <span className="time-label">Start:&nbsp;</span>{formatDateTime(event.start_time)}
+                        </p>
+                        <p className="event-time">
+                          <span className="time-label">End:&nbsp;</span>{formatDateTime(event.end_time)}
+                        </p>
+                        {event.entry_url && (
+                          <p className="event-m3u">
+                            <span className="time-label">Stream:&nbsp;</span>
+                            <a href={event.entry_url} target="_blank" rel="noopener noreferrer" title={event.entry_url}>
+                              {event.m3u_title || 'View'}
+                            </a>
+                          </p>
+                        )}
+                      </div>
+                      <div className="event-actions">
+                        <button className="edit-btn" onClick={() => handleEdit(event)}>Edit</button>
+                        <button className="delete-btn" onClick={() => handleDelete(event.id)}>Delete</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Playlists Tab */}
+        {activeTab === 'playlists' && (
+          <div className="playlists-tab-content">
+            <PlaylistsManager />
+          </div>
+        )}
+      </div>
+
+      {showM3UModal && (
+        <M3UPlaylists
+          onEntrySelected={handleSelectM3UEntry}
+          onClose={() => setShowM3UModal(false)}
+        />
+      )}
     </div>
   )
 }

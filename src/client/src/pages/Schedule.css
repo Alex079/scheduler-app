@@ -36,6 +36,36 @@
   background-color: #da190b;
 }
 
+/* Tabs */
+.tabs-header {
+  display: flex;
+  background-color: white;
+  border-bottom: 2px solid #ddd;
+  padding: 0 30px;
+}
+
+.tab-btn {
+  padding: 16px 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  margin-bottom: -2px;
+}
+
+.tab-btn:hover {
+  color: #333;
+}
+
+.tab-btn.active {
+  color: #2196F3;
+  border-bottom-color: #2196F3;
+}
+
 .schedule-content {
   display: flex;
   flex: 1;
@@ -167,6 +197,99 @@
   color: #333;
 }
 
+.event-m3u {
+  margin: 8px 0;
+  color: #0066cc;
+  font-size: 13px;
+}
+
+.event-m3u a {
+  color: #0066cc;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.event-m3u a:hover {
+  text-decoration: underline;
+}
+
+.m3u-selected {
+  background-color: #f0f8ff;
+  border: 1px solid #0066cc;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.m3u-selected-title {
+  font-weight: 500;
+  color: #333;
+  font-size: 13px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.m3u-selected-url {
+  font-size: 11px;
+  color: #666;
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 8px;
+}
+
+.m3u-selected-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.m3u-change-btn,
+.m3u-clear-btn {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 12px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.m3u-change-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.m3u-change-btn:hover {
+  background-color: #1976D2;
+}
+
+.m3u-clear-btn {
+  background-color: #ddd;
+  color: #333;
+}
+
+.m3u-clear-btn:hover {
+  background-color: #ccc;
+}
+
+.m3u-select-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.m3u-select-btn:hover {
+  background-color: #1976D2;
+}
+
 .event-actions {
   display: flex;
   gap: 10px;
@@ -188,6 +311,12 @@
 
 .delete-btn:hover {
   background-color: #da190b;
+}
+
+.playlists-tab-content {
+  flex: 1;
+  overflow: hidden;
+  width: 100%;
 }
 
 @media (max-width: 1024px) {

@@ -23,14 +23,43 @@ function initializeDatabase() {
       name TEXT NOT NULL,
       start_time DATETIME NOT NULL,
       end_time DATETIME NOT NULL,
+      m3u_entry_id INTEGER,
       created_by INTEGER NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (created_by) REFERENCES users(id)
+      FOREIGN KEY (created_by) REFERENCES users(id),
+      FOREIGN KEY (m3u_entry_id) REFERENCES m3u_entries(id)
+    )
+  `);
+
+  // Create M3U playlists table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS m3u_playlists (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      url TEXT UNIQUE NOT NULL,
+      name TEXT,
+      last_refreshed DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Create M3U entries table (parsed URLs from playlists)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS m3u_entries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      playlist_id INTEGER NOT NULL,
+      entry_url TEXT NOT NULL,
+      title TEXT,
+      logo TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (playlist_id) REFERENCES m3u_playlists(id) ON DELETE CASCADE
     )
   `);
 
   // Seed admin users if they don't exist
   seedUsers();
+  
+  // Start daily M3U refresh job
+  require('./services/m3u-refresher').startDailyRefresh(db);
 }
 
 function seedUsers() {

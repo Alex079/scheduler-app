@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const authRoutes = require('./src/server/routes/auth');
 const eventRoutes = require('./src/server/routes/events');
+const m3uRoutes = require('./src/server/routes/m3u');
 const { initializeDatabase } = require('./src/server/db');
 
 const app = express();
@@ -18,6 +19,7 @@ initializeDatabase();
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/m3u', m3uRoutes);
 
 // Serve static React frontend
 const staticPath = path.join(__dirname, 'src/client/dist');
