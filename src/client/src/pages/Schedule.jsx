@@ -4,6 +4,25 @@ import M3UPlaylists from './M3UPlaylists'
 import PlaylistsManager from './PlaylistsManager'
 import './Schedule.css'
 
+// Convert Unix timestamp (seconds) to datetime-local format for input field
+const unixToDatetimeLocal = (unixSeconds) => {
+  if (!unixSeconds) return ''
+  const date = new Date(unixSeconds * 1000)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day}T${hours}:${minutes}`
+}
+
+// Convert datetime-local format to Unix timestamp (seconds) for API
+const datetimeLocalToUnix = (localString) => {
+  if (!localString) return null
+  const date = new Date(`${localString}:00`)
+  return Math.floor(date.getTime() / 1000)
+}
+
 export default function Schedule({ username, onLogout }) {
   const [activeTab, setActiveTab] = useState('schedule') // 'schedule' or 'playlists'
   const [events, setEvents] = useState([])
@@ -57,19 +76,23 @@ export default function Schedule({ username, onLogout }) {
     }
 
     try {
+      // Convert local datetime to Unix timestamp before sending to API
+      const start_time_unix = datetimeLocalToUnix(formData.start_time)
+      const end_time_unix = datetimeLocalToUnix(formData.end_time)
+
       if (editingId) {
         await eventsAPI.update(
           editingId,
           formData.name,
-          formData.start_time,
-          formData.end_time,
+          start_time_unix,
+          end_time_unix,
           formData.m3u_entry_id
         )
       } else {
         await eventsAPI.create(
           formData.name,
-          formData.start_time,
-          formData.end_time,
+          start_time_unix,
+          end_time_unix,
           formData.m3u_entry_id
         )
       }
@@ -84,8 +107,9 @@ export default function Schedule({ username, onLogout }) {
   const handleEdit = (event) => {
     setFormData({
       name: event.name,
-      start_time: event.start_time,
-      end_time: event.end_time,
+      // Convert Unix timestamp to local datetime-local format for editing
+      start_time: unixToDatetimeLocal(event.start_time),
+      end_time: unixToDatetimeLocal(event.end_time),
       m3u_entry_id: event.m3u_entry_id,
     })
     if (event.m3u_entry_id) {
@@ -128,8 +152,9 @@ export default function Schedule({ username, onLogout }) {
     setError('')
   }
 
-  const formatDateTime = (dateTime) => {
-    return new Date(dateTime).toLocaleString()
+  const formatDateTime = (unixSeconds) => {
+    if (!unixSeconds) return 'N/A'
+    return new Date(unixSeconds * 1000).toLocaleString()
   }
 
   return (

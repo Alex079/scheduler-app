@@ -12,7 +12,7 @@ function initializeDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER))
     )
   `);
 
@@ -21,11 +21,11 @@ function initializeDatabase() {
     CREATE TABLE IF NOT EXISTS events (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      start_time DATETIME NOT NULL,
-      end_time DATETIME NOT NULL,
+      start_time INTEGER NOT NULL,
+      end_time INTEGER NOT NULL,
       m3u_entry_id INTEGER,
       created_by INTEGER NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
       FOREIGN KEY (created_by) REFERENCES users(id),
       FOREIGN KEY (m3u_entry_id) REFERENCES m3u_entries(id)
     )
@@ -37,8 +37,8 @@ function initializeDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       url TEXT UNIQUE NOT NULL,
       name TEXT,
-      last_refreshed DATETIME,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      last_refreshed INTEGER,
+      created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER))
     )
   `);
 
@@ -50,7 +50,7 @@ function initializeDatabase() {
       entry_url TEXT NOT NULL,
       title TEXT,
       logo TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
       FOREIGN KEY (playlist_id) REFERENCES m3u_playlists(id) ON DELETE CASCADE
     )
   `);

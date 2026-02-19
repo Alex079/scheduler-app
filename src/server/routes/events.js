@@ -15,6 +15,7 @@ router.get('/', verifyToken, (req, res) => {
       e.end_time, 
       e.m3u_entry_id,
       e.created_by,
+      e.created_at,
       m.entry_url,
       m.title as m3u_title
     FROM events e
@@ -24,7 +25,8 @@ router.get('/', verifyToken, (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
     }
-    res.json(rows);
+    // Unix timestamps are already numbers, no conversion needed
+    res.json(rows || []);
   });
 });
 

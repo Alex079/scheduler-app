@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react'
 import { m3uAPI } from '../api/client'
 import './PlaylistsManager.css'
 
+// Convert Unix timestamp (seconds) to local time string
+const formatUnixTimestamp = (unixSeconds) => {
+  if (!unixSeconds) return 'Never'
+  return new Date(unixSeconds * 1000).toLocaleString()
+}
+
 export default function PlaylistsManager() {
   const [playlists, setPlaylists] = useState([])
   const [entries, setEntries] = useState([])
@@ -144,10 +150,7 @@ export default function PlaylistsManager() {
                       <div className="playlist-name">{p.name}</div>
                       <div className="playlist-url" title={p.url}>{p.url}</div>
                       <div className="playlist-meta">
-                        {p.last_refreshed 
-                          ? `Last refresh: ${new Date(p.last_refreshed).toLocaleString()}`
-                          : 'Never refreshed'
-                        }
+                        Last refresh: {formatUnixTimestamp(p.last_refreshed)}
                       </div>
                     </div>
                     <div className="playlist-actions">

@@ -114,9 +114,9 @@ async function refreshPlaylist(db, playlistId) {
               insertStmt.finalize((err) => {
                 if (err) return reject(err);
 
-                // Update last_refreshed timestamp
+                // Update last_refreshed timestamp (Unix timestamp in seconds)
                 db.run(
-                  'UPDATE m3u_playlists SET last_refreshed = CURRENT_TIMESTAMP WHERE id = ?',
+                  "UPDATE m3u_playlists SET last_refreshed = CAST(strftime('%s', 'now') AS INTEGER) WHERE id = ?",
                   [playlistId],
                   (err) => {
                     if (err) return reject(err);

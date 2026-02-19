@@ -8,10 +8,11 @@ const router = express.Router();
 // Get all M3U playlists
 router.get('/playlists', verifyToken, (req, res) => {
   const db = getDatabase();
-  db.all('SELECT id, url, name, last_refreshed FROM m3u_playlists ORDER BY created_at DESC', (err, rows) => {
+  db.all('SELECT id, url, name, last_refreshed, created_at FROM m3u_playlists ORDER BY created_at DESC', (err, rows) => {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
     }
+    // Unix timestamps are already numbers, no conversion needed
     res.json(rows || []);
   });
 });
@@ -21,7 +22,7 @@ router.get('/entries', verifyToken, (req, res) => {
   const db = getDatabase();
   const playlistId = req.query.playlistId;
 
-  let query = 'SELECT id, playlist_id, entry_url, title, logo FROM m3u_entries';
+  let query = 'SELECT id, playlist_id, entry_url, title, logo, created_at FROM m3u_entries';
   let params = [];
 
   if (playlistId) {
@@ -35,6 +36,7 @@ router.get('/entries', verifyToken, (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
     }
+    // Unix timestamps are already numbers, no conversion needed
     res.json(rows || []);
   });
 });
