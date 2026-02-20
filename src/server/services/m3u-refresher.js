@@ -138,26 +138,33 @@ async function refreshPlaylist(db, playlistId) {
 }
 
 function startDailyRefresh(db) {
-  // Refresh all playlists immediately on startup
-  db.all('SELECT id FROM m3u_playlists', (err, playlists) => {
-    if (!err && playlists && playlists.length > 0) {
-      console.log(`Found ${playlists.length} M3U playlists. Starting refresh...`);
+  /**
+   * Refresh all playlists
+   */
+  function refreshAllPlaylists() {
+    db.all('SELECT id FROM m3u_playlists', (err, playlists) => {
+      if (err) {
+        console.error('Failed to load playlists:', err);
+        return;
+      }
+      if (!playlists || playlists.length === 0) {
+        console.log('No M3U playlists to refresh');
+        return;
+      }
       playlists.forEach(p => {
         refreshPlaylist(db, p.id).catch(err => console.error('Refresh error:', err));
       });
-    }
-  });
+    });
+  }
+
+  // Refresh all playlists immediately on startup
+  console.log('Refreshing M3U playlists on startup...');
+  refreshAllPlaylists();
 
   // Schedule daily refresh at midnight
   setInterval(() => {
     console.log('Running daily M3U playlist refresh...');
-    db.all('SELECT id FROM m3u_playlists', (err, playlists) => {
-      if (!err && playlists) {
-        playlists.forEach(p => {
-          refreshPlaylist(db, p.id).catch(err => console.error('Refresh error:', err));
-        });
-      }
-    });
+    refreshAllPlaylists();
   }, 24 * 60 * 60 * 1000); // Every 24 hours
 }
 

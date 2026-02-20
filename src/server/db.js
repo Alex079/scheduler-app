@@ -26,6 +26,8 @@ function initializeDatabase() {
       m3u_entry_id INTEGER,
       created_by INTEGER NOT NULL,
       created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
+      recording_file TEXT,
+      recording_status TEXT,
       FOREIGN KEY (created_by) REFERENCES users(id),
       FOREIGN KEY (m3u_entry_id) REFERENCES m3u_entries(id)
     )
@@ -60,6 +62,9 @@ function initializeDatabase() {
   
   // Start daily M3U refresh job
   require('./services/m3u-refresher').startDailyRefresh(db);
+  
+  // Start event scheduler for FFmpeg recordings
+  require('./services/event-runner').startEventScheduler(db);
 }
 
 function seedUsers() {

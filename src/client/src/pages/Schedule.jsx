@@ -308,6 +308,20 @@ export default function Schedule({ username, onLogout }) {
                             </a>
                           </p>
                         )}
+                        {event.recording_status && (
+                          <div className="recording-status-container">
+                            <span className="time-label">Recording:&nbsp;</span>
+                            <span className={`recording-status recording-status-${event.recording_status}`}>
+                              {event.recording_status.charAt(0).toUpperCase() + event.recording_status.slice(1)}
+                            </span>
+                          </div>
+                        )}
+                        {event.recording_file && (
+                          <p className="event-filename">
+                            <span className="time-label">File:&nbsp;</span>
+                            <span title={event.recording_file}>{event.recording_file}</span>
+                          </p>
+                        )}
                       </div>
                       <div className="event-actions">
                         <button className="edit-btn" onClick={() => handleEdit(event)}>Edit</button>

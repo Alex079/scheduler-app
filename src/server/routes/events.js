@@ -1,8 +1,13 @@
 const express = require('express');
 const { verifyToken } = require('../middleware/auth');
 const { getDatabase } = require('../db');
+const { cancelScheduledEvent } = require('../services/event-runner');
+const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
+
+const RECORDINGS_DIR = path.join(__dirname, '../../recordings');
 
 // Get all events with M3U entry details
 router.get('/', verifyToken, (req, res) => {
@@ -16,6 +21,8 @@ router.get('/', verifyToken, (req, res) => {
       e.m3u_entry_id,
       e.created_by,
       e.created_at,
+      e.recording_file,
+      e.recording_status,
       m.entry_url,
       m.title as m3u_title
     FROM events e
@@ -85,9 +92,10 @@ router.put('/:id', verifyToken, (req, res) => {
 
 // Delete event
 router.delete('/:id', verifyToken, (req, res) => {
-  const eventId = req.params.id;
+  const eventId = parseInt(req.params.id, 10);
   const db = getDatabase();
 
+  cancelScheduledEvent(eventId);
   db.run('DELETE FROM events WHERE id = ?', [eventId], function (err) {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
@@ -97,6 +105,31 @@ router.delete('/:id', verifyToken, (req, res) => {
     }
     res.json({ message: 'Event deleted' });
   });
+});
+
+// Get all recordings
+router.get('/recordings', verifyToken, (req, res) => {
+  // Ensure recordings directory exists
+  if (!fs.existsSync(RECORDINGS_DIR)) {
+    return res.json([]);
+  }
+
+  try {
+    const files = fs.readdirSync(RECORDINGS_DIR).filter(f => f.endsWith('.mp4'));
+    const recordings = files.map(filename => {
+      const filepath = path.join(RECORDINGS_DIR, filename);
+      const stats = fs.statSync(filepath);
+      return {
+        filename,
+        size: stats.size,
+        created: stats.birthtime,
+      };
+    });
+    res.json(recordings.sort((a, b) => new Date(b.created) - new Date(a.created)));
+  } catch (err) {
+    console.error('Failed to list recordings:', err);
+    res.status(500).json({ error: 'Failed to list recordings' });
+  }
 });
 
 module.exports = router;
