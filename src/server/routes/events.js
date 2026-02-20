@@ -68,15 +68,19 @@ router.post('/', verifyToken, (req, res) => {
 // Update event
 router.put('/:id', verifyToken, (req, res) => {
   const { name, start_time, end_time, m3u_entry_id } = req.body;
-  const eventId = req.params.id;
+  const eventId = parseInt(req.params.id, 10);
 
   if (!name || !start_time || !end_time) {
     return res.status(400).json({ error: 'Name, start_time, and end_time required' });
   }
 
   const db = getDatabase();
+  
+  // Cancel currently scheduled recording if event is being rescheduled
+  cancelScheduledEvent(eventId);
+  
   db.run(
-    'UPDATE events SET name = ?, start_time = ?, end_time = ?, m3u_entry_id = ? WHERE id = ?',
+    'UPDATE events SET name = ?, start_time = ?, end_time = ?, m3u_entry_id = ?, recording_status = NULL WHERE id = ?',
     [name, start_time, end_time, m3u_entry_id || null, eventId],
     function (err) {
       if (err) {

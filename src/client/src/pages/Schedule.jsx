@@ -138,6 +138,25 @@ export default function Schedule({ username, onLogout }) {
     }
   }
 
+  const isEventEditable = (event) => {
+    const now = Math.floor(Date.now() / 1000)
+    const nonEditableStatuses = ['started', 'completed', 'failed']
+    // Not editable if: has non-editable status OR event has ended
+    return !nonEditableStatuses.includes(event.recording_status) && event.end_time > now
+  }
+
+  const getEditButtonTitle = (event) => {
+    const now = Math.floor(Date.now() / 1000)
+    const nonEditableStatuses = ['started', 'completed', 'failed']
+    if (nonEditableStatuses.includes(event.recording_status)) {
+      return `Cannot edit: recording ${event.recording_status}`
+    }
+    if (event.end_time <= now) {
+      return 'Cannot edit: event has ended'
+    }
+    return 'Edit event'
+  }
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -324,7 +343,14 @@ export default function Schedule({ username, onLogout }) {
                         )}
                       </div>
                       <div className="event-actions">
-                        <button className="edit-btn" onClick={() => handleEdit(event)}>Edit</button>
+                        <button 
+                          className="edit-btn" 
+                          onClick={() => handleEdit(event)}
+                          disabled={!isEventEditable(event)}
+                          title={getEditButtonTitle(event)}
+                        >
+                          Edit
+                        </button>
                         <button className="delete-btn" onClick={() => handleDelete(event.id)}>Delete</button>
                       </div>
                     </div>

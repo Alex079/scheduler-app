@@ -118,10 +118,10 @@ function scheduleEventRecording(db, event, entry) {
     try {
       const { command, outputPath, filename } = buildFFmpegCommand(event, entry);
       
-      // Update event with recording filename
+      // Update event with recording filename and started status
       db.run(
-        'UPDATE events SET recording_file = ? WHERE id = ?',
-        [filename, event.id]
+        'UPDATE events SET recording_file = ?, recording_status = ? WHERE id = ?',
+        [filename, 'started', event.id]
       );
 
       executeRecording(command, outputPath, event.id, event.name)

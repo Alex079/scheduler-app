@@ -300,17 +300,25 @@
   background-color: #2196F3;
 }
 
-.edit-btn:hover {
+.edit-btn:hover:not(:disabled) {
   background-color: #1976D2;
+}
+
+.edit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .delete-btn {
   flex: 1;
   background-color: #f44336;
+  color: white;
 }
 
 .delete-btn:hover {
   background-color: #da190b;
+  color: white;
 }
 
 .playlists-tab-content {
@@ -340,6 +348,12 @@
   background-color: #fff3cd;
   color: #856404;
   border: 1px solid #ffc107;
+}
+
+.recording-status-started {
+  background-color: #cfe8fc;
+  color: #1565c0;
+  border: 1px solid #2196F3;
 }
 
 .recording-status-completed {
