@@ -23,7 +23,7 @@ function initializeDatabase() {
       name TEXT NOT NULL,
       start_time INTEGER NOT NULL,
       end_time INTEGER NOT NULL,
-      m3u_entry_id INTEGER,
+      m3u_entry_id INTEGER NOT NULL,
       created_by INTEGER NOT NULL,
       created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
       recording_file TEXT,

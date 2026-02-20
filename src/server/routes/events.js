@@ -26,7 +26,7 @@ router.get('/', verifyToken, (req, res) => {
       m.entry_url,
       m.title as m3u_title
     FROM events e
-    LEFT JOIN m3u_entries m ON e.m3u_entry_id = m.id
+    INNER JOIN m3u_entries m ON e.m3u_entry_id = m.id
     ORDER BY e.start_time
   `, (err, rows) => {
     if (err) {
@@ -37,18 +37,18 @@ router.get('/', verifyToken, (req, res) => {
   });
 });
 
-// Create event with optional M3U entry reference
+// Create event with required M3U entry reference
 router.post('/', verifyToken, (req, res) => {
   const { name, start_time, end_time, m3u_entry_id } = req.body;
 
-  if (!name || !start_time || !end_time) {
-    return res.status(400).json({ error: 'Name, start_time, and end_time required' });
+  if (!name || !start_time || !end_time || !m3u_entry_id) {
+    return res.status(400).json({ error: 'Name, start_time, end_time, and m3u_entry_id are required' });
   }
 
   const db = getDatabase();
   db.run(
     'INSERT INTO events (name, start_time, end_time, m3u_entry_id, created_by) VALUES (?, ?, ?, ?, ?)',
-    [name, start_time, end_time, m3u_entry_id || null, req.userId],
+    [name, start_time, end_time, m3u_entry_id, req.userId],
     function (err) {
       if (err) {
         return res.status(500).json({ error: 'Database error' });
@@ -58,7 +58,7 @@ router.post('/', verifyToken, (req, res) => {
         name,
         start_time,
         end_time,
-        m3u_entry_id: m3u_entry_id || null,
+        m3u_entry_id,
         created_by: req.userId,
       });
     }
@@ -70,8 +70,8 @@ router.put('/:id', verifyToken, (req, res) => {
   const { name, start_time, end_time, m3u_entry_id } = req.body;
   const eventId = parseInt(req.params.id, 10);
 
-  if (!name || !start_time || !end_time) {
-    return res.status(400).json({ error: 'Name, start_time, and end_time required' });
+  if (!name || !start_time || !end_time || !m3u_entry_id) {
+    return res.status(400).json({ error: 'Name, start_time, end_time, and m3u_entry_id are required' });
   }
 
   const db = getDatabase();
@@ -81,7 +81,7 @@ router.put('/:id', verifyToken, (req, res) => {
   
   db.run(
     'UPDATE events SET name = ?, start_time = ?, end_time = ?, m3u_entry_id = ?, recording_status = NULL WHERE id = ?',
-    [name, start_time, end_time, m3u_entry_id || null, eventId],
+    [name, start_time, end_time, m3u_entry_id, eventId],
     function (err) {
       if (err) {
         return res.status(500).json({ error: 'Database error' });
@@ -89,7 +89,7 @@ router.put('/:id', verifyToken, (req, res) => {
       if (this.changes === 0) {
         return res.status(404).json({ error: 'Event not found' });
       }
-      res.json({ id: eventId, name, start_time, end_time, m3u_entry_id: m3u_entry_id || null });
+      res.json({ id: eventId, name, start_time, end_time, m3u_entry_id });
     }
   );
 });

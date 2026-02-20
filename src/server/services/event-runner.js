@@ -46,11 +46,13 @@ function buildFFmpegCommand(event, entry) {
   const startFormatted = formatTimestampForFilename(event.start_time);
   const endFormatted = formatTimestampForFilename(event.end_time);
   const duration = event.end_time - event.start_time; // in seconds
+  const title = event.name;
+  const description = `${entry.title}: ${new Date(event.start_time * 1000).toISOString()} - ${new Date(event.end_time * 1000).toISOString()}`;
 
   const filename = `${startFormatted}_${endFormatted}_${streamName}_${eventName}.mp4`;
   const outputPath = path.join(RECORDINGS_DIR, filename);
-
-  const command = `ffmpeg -i "${streamUrl}" -t ${duration} -c:v copy -c:a copy -f mp4 -metadata title="${event.name}" -metadata description="${entry.title}" "${outputPath}"`;
+  
+  const command = `ffmpeg -i "${streamUrl}" -t ${duration} -c:v copy -c:a copy -f mp4 -metadata title="${title}" -metadata description="${description}" "${outputPath}"`;
 
   return { command, outputPath, filename };
 }
@@ -156,7 +158,7 @@ function scheduleEventRecording(db, event, entry) {
 function startEventScheduler(db) {
   console.log('Starting event scheduler...');
 
-  // Check for events in the next 24 hours every 5 minutes
+  // Check for events in the next 24 hours every minute
   function checkUpcomingEvents() {
     const oneDayInSeconds = 24 * 60 * 60;
     const now = Math.floor(Date.now() / 1000);
@@ -176,13 +178,8 @@ function startEventScheduler(db) {
       `,
       [now, now + oneDayInSeconds],
       (err, rows) => {
-        if (err) {
+        if (err || !rows) {
           console.error('Failed to load events:', err);
-          return;
-        }
-
-        if (!rows || rows.length === 0) {
-          console.log('No matching events to schedule');
           return;
         }
 
@@ -202,9 +199,9 @@ function startEventScheduler(db) {
     );
   }
 
-  // Run immediately and then every 5 minutes
+  // Run immediately and then every minute
   checkUpcomingEvents();
-  setInterval(checkUpcomingEvents, 5 * 60 * 1000); // Every 5 minutes
+  setInterval(checkUpcomingEvents, 60 * 1000); // Every minute
 }
 
 /**

@@ -70,7 +70,7 @@ export default function Schedule({ username, onLogout }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!formData.name || !formData.start_time || !formData.end_time) {
+    if (!formData.name || !formData.start_time || !formData.end_time || !formData.m3u_entry_id) {
       setError('All fields are required')
       return
     }
@@ -255,7 +255,7 @@ export default function Schedule({ username, onLogout }) {
 
                     {/* M3U Entry Selection */}
                     <div className="form-group">
-                      <label>M3U Entry (Optional)</label>
+                      <label>M3U Entry</label>
                       {selectedM3UEntry ? (
                         <div className="m3u-selected">
                           <div className="m3u-selected-title">{selectedM3UEntry.title}</div>
