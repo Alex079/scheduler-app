@@ -59,7 +59,6 @@ export default function Login({ onLoginSuccess }) {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        <p className="info-text">Demo users: alice, bob, charlie (password: password123, password456, password789)</p>
       </div>
     </div>
   )
