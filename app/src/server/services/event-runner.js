@@ -42,10 +42,10 @@ function sanitizeFilename(str) {
 }
 
 /**
- * Build FFmpeg command with template substitutions
+ * Build recording command for an event
  * @param {Object} event - Event object with name, start_time, end_time, m3u_entry_id
  * @param {Object} entry - M3U entry object with entry_url, title
- * @returns {Object} { command: string, outputPath: string }
+ * @returns {Object} { command: string, filename: string }
  */
 function buildCommand(event) {
   if (!event.entry_url) {
