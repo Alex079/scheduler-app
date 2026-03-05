@@ -146,7 +146,7 @@
   min-width: 0;
 }
 
-.m3u-playlist-name {
+.m3u-playlist-name, .m3u-playlist-url {
   font-weight: 500;
   color: #333;
   font-size: 13px;

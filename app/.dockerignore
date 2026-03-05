@@ -3,5 +3,3 @@ npm-debug.log
 .DS_Store
 dist/
 node_modules/
-database/
-recordings/

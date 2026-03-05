@@ -1,0 +1,24 @@
+services:
+  scheduler-app:
+    container_name: scheduler-app
+    image: scheduler-app
+    build: app
+    restart: unless-stopped
+    environment:
+      - USERS=admin:admin123
+    ports:
+      - 3000:3000
+    volumes:
+      - ./database:/database
+      - pipe:/pipe
+  ffmpeg-app:
+    container_name: ffmpeg-app
+    image: ffmpeg-app
+    build: ffmpeg-app
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - ./recordings:/recordings
+      - pipe:/pipe
+volumes:
+  pipe:

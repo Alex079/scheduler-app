@@ -1,9 +1,0 @@
-node_modules
-npm-debug.log
-.git
-.gitignore
-.env
-.DS_Store
-src/client/dist
-src/client/node_modules
-scheduler.db
