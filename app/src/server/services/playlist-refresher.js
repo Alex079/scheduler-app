@@ -1,8 +1,6 @@
 import fetch from 'node-fetch';
 import { getAllPlaylists, getPlaylistEntries, getPlaylistUrl, updatePlaylistEntries, updatePlaylistTime } from '../db/db.js';
 
-const scheduledRefresh = new Set();
-
 function parseM3U(content) {
   const lines = content.split('\n');
   const entries = [];
@@ -84,6 +82,5 @@ export function startPlaylistScheduler() {
     getAllPlaylists().forEach(({ id }) => refreshPlaylist(id));
   }
   refreshAllPlaylists();
-  const timeoutId = setInterval(refreshAllPlaylists, 24 * 60 * 60 * 1000); // Every 24 hours
-  scheduledRefresh.add(timeoutId);
+  setInterval(refreshAllPlaylists, 24 * 60 * 60 * 1000); // Every 24 hours
 }
