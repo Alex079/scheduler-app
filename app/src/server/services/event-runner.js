@@ -61,7 +61,7 @@ function buildCommand(event) {
 
   const filename = `${startFormatted}_${endFormatted}_${streamName}_${eventName}.mp4`;
   
-  const command = `ID=${event.id}; STREAM=${streamUrl}; DURATION=${duration}; OUTPUT=${filename}`;
+  const command = `ID=${event.id} STREAM=${streamUrl} DURATION=${duration} OUTPUT=${filename}`;
 
   return { command, filename };
 }
