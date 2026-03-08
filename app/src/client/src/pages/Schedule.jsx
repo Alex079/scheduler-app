@@ -51,6 +51,7 @@ export default function Schedule({ username, onLogout }) {
     } catch (err) {
       setError('Failed to load events')
       console.error(err)
+      if (err.status === 401) onLogout()
     } finally {
       setLoading(false)
     }
@@ -101,6 +102,7 @@ export default function Schedule({ username, onLogout }) {
     } catch (err) {
       setError('Failed to save event')
       console.error(err)
+      if (err.status === 401) onLogout()
     }
   }
 
@@ -135,6 +137,7 @@ export default function Schedule({ username, onLogout }) {
     } catch (err) {
       setError('Failed to delete event')
       console.error(err)
+      if (err.status === 401) onLogout()
     }
   }
 
