@@ -8,7 +8,7 @@ mkfifo /pipe/response
 echo "Starting scheduler-app..."
 
 # Start the Node.js server in the background
-APP_PORT=3000 JWT_SECRET=`openssl rand -hex 64` node src/server/server.js &
+APP_PORT=3000 JWT_SECRET=`tr -dc A-Za-z0-9 < /dev/urandom | head -c 32` node src/server/server.js &
 PID=$!
 
 trap "echo 'Stopping scheduler-app...' ; kill -TERM $PID ; exit 0" SIGINT SIGTERM
