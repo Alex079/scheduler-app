@@ -1,25 +1,12 @@
 #!/bin/sh
 
-for token in $@; do
-  case "$token" in
-    *=*)
-      var=${token%%=*}
-      val=${token#*=}
-      case "$var" in
-        ID|STREAM|DURATION|OUTPUT)
-          val=${val#\'}; val=${val%\'}
-          eval "$var=\$val"
-          ;;
-        *)
-          echo "Bad variable name: $var" >&2
-          exit 1
-          ;;
-      esac
-      ;;
-    *)
-      echo "Unexpected token: $token" >&2
-      exit 1
-      ;;
+for arg in $@; do
+  case "$arg" in
+    ID=*)       ID=${arg#*=} ;;
+    STREAM=*)   STREAM=${arg#*=} ;;
+    DURATION=*) DURATION=${arg#*=} ;;
+    OUTPUT=*)   OUTPUT=${arg#*=} ;;
+    *) echo "Bad argument: $arg" >&2 ;;
   esac
 done
 # validate required vars
