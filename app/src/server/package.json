@@ -16,15 +16,15 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.3",
-    "node-fetch": "^2.7.0",
-    "better-sqlite3": "^12.6.2"
+    "bcryptjs": "^3",
+    "cors": "^2",
+    "dotenv": "^17",
+    "express": "^5",
+    "jsonwebtoken": "^9",
+    "node-fetch": "^3",
+    "better-sqlite3": "^12"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6"
+    "@types/bcryptjs": "^3"
   }
 }
