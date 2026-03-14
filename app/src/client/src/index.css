@@ -36,3 +36,14 @@ input:focus, textarea:focus, select:focus {
   border-color: #2196F3;
   box-shadow: 0 0 4px rgba(33, 150, 243, 0.3);
 }
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
