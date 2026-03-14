@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { playlistAPI } from '../api/client'
-import './M3UPlaylists.css'
+import './PlaylistManager.css'
 
 // Convert Unix timestamp (seconds) to local time string
 const formatUnixTimestamp = (unixSeconds) => {
@@ -8,7 +8,7 @@ const formatUnixTimestamp = (unixSeconds) => {
   return new Date(unixSeconds * 1000).toLocaleString()
 }
 
-export default function M3UPlaylists({ onEntrySelected, onClose }) {
+export default function PlaylistManager({ onEntrySelected, onClose }) {
   const [playlists, setPlaylists] = useState([])
   const [entries, setEntries] = useState([])
   const [selectedPlaylist, setSelectedPlaylist] = useState(null)
@@ -118,103 +118,108 @@ export default function M3UPlaylists({ onEntrySelected, onClose }) {
     <div className="m3u-modal">
       <div className="m3u-modal-content">
         <div className="m3u-modal-header">
-          <h2>M3U Playlists</h2>
+          <h2>Playlists</h2>
+          <p className="playlists-description">Manage your playlist URLs and entries</p>
           <button className="m3u-close-btn" onClick={onClose}>×</button>
         </div>
         <div className="m3u-container">
           {/* Left: Playlists */}
-          <div className="m3u-left">
-            <h3>Add Playlist</h3>
-
-            {/* Add Playlist Form */}
-            <form onSubmit={handleAddPlaylist} className="m3u-add-form">
-              <input
-                type="url"
-                value={newPlaylistUrl}
-                onChange={(e) => setNewPlaylistUrl(e.target.value)}
-                placeholder="Playlist URL"
-                disabled={addingPlaylist}
-              />
-              <input
-                type="text"
-                value={newPlaylistName}
-                onChange={(e) => setNewPlaylistName(e.target.value)}
-                placeholder="Playlist name (optional)"
-                disabled={addingPlaylist}
-              />
-              <button type="submit" disabled={addingPlaylist || !newPlaylistUrl}>
-                {addingPlaylist ? 'Adding...' : 'Add'}
-              </button>
-            </form>
+          <div className="playlists-left">
+            <div className="add-playlist-section">
+              <h3>Add Playlist</h3>
+              <form onSubmit={handleAddPlaylist} className="playlist-add-form">
+                <input
+                  required
+                  type="url"
+                  value={newPlaylistUrl}
+                  onChange={(e) => setNewPlaylistUrl(e.target.value)}
+                  placeholder="Playlist URL"
+                  disabled={addingPlaylist}
+                />
+                <input
+                  type="text"
+                  value={newPlaylistName}
+                  onChange={(e) => setNewPlaylistName(e.target.value)}
+                  placeholder="Playlist name (optional)"
+                  disabled={addingPlaylist}
+                />
+                <button type="submit" disabled={addingPlaylist || !newPlaylistUrl}>
+                  {addingPlaylist ? '⏳' : 'Add'}
+                </button>
+              </form>
+            </div>
 
             {/* Playlists List */}
-            <div className="m3u-list">
-              {loading && playlists.length === 0 && <p>Loading...</p>}
-              {playlists.length === 0 ? (
-                <p className="m3u-empty">No playlists</p>
-              ) : (
-                playlists.map(p => (
-                  <div
-                    key={p.id}
-                    className={`m3u-playlist-item ${selectedPlaylist === p.id ? 'active' : ''}`}
-                  >
-                    <div onClick={() => loadEntries(p.id)} className="m3u-playlist-info">
-                      <div className="m3u-playlist-name">{p.name}</div>
-                      <div className="m3u-playlist-url">{p.url}</div>
-                      <div className="m3u-playlist-meta">
-                        Last refresh: {formatUnixTimestamp(p.last_refreshed)}
+            <div className="playlists-list-section">
+              <h3>Your Playlists ({playlists.length})</h3>
+              <div className="playlists-list">
+                {loading && playlists.length === 0 && <p>Loading...</p>}
+                {playlists.length === 0 ? (
+                  <p className="empty-message">No playlists</p>
+                ) : (
+                  playlists.map(p => (
+                    <div
+                      key={p.id}
+                      className={`playlist-item ${selectedPlaylist === p.id ? 'active' : ''}`}
+                    >
+                      <div onClick={() => loadEntries(p.id)} className="playlist-info">
+                        <div className="playlist-name">{p.name}</div>
+                        <div className="playlist-url" title={p.url}>{p.url}</div>
+                        <div className="playlist-meta">
+                          Last refresh: {formatUnixTimestamp(p.last_refreshed)}
+                        </div>
+                      </div>
+                      <div className="playlist-actions">
+                        <button
+                          className="playlist-refresh-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRefresh(p.id)
+                          }}
+                          title="Refresh"
+                        >
+                          ↻
+                        </button>
+                        <button
+                          className="playlist-delete-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeletePlaylist(p.id)
+                          }}
+                          title="Delete"
+                        >
+                          ✕
+                        </button>
                       </div>
                     </div>
-                    <div className="m3u-playlist-actions">
-                      <button
-                        className="m3u-refresh-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleRefresh(p.id)
-                        }}
-                        title="Refresh"
-                      >
-                        ↻
-                      </button>
-                      <button
-                        className="m3u-delete-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeletePlaylist(p.id)
-                        }}
-                        title="Delete"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
           </div>
 
           {/* Right: Entries */}
-          <div className="m3u-right">
+          <div className="playlists-right">
             <h3>Entries {selectedPlaylist && `(${entries.length})`}</h3>
             {selectedPlaylist ? (
               <>
-                <div className="m3u-entries-list">
+                <div className="entries-list">
                   {loading && <p>Loading...</p>}
                   {entries.length === 0 ? (
-                    <p className="m3u-empty">No entries</p>
+                    <p className="empty-message">No entries</p>
                   ) : (
                     entries.map(e => (
                       <div
                         key={e.id}
-                        className={`m3u-entry-item ${selectedEntry === e.id ? 'active' : ''}`}
+                        className={`entry-item ${onEntrySelected && (selectedEntry === e.id) ? 'active' : ''}`}
                         onClick={() => setSelectedEntry(e.id)}
                       >
                         {e.logo && (
-                          <img src={e.logo} alt="" className="m3u-entry-logo" onError={(e) => e.target.style.display = 'none'} />
+                          <img src={e.logo} alt="" className="entry-logo" onError={(e) => e.target.style.display = 'none'} />
                         )}
-                        <div className="m3u-entry-content">
-                          <div className="m3u-entry-title">{e.title || 'Untitled'}</div>
-                          <div className="m3u-entry-url">{e.entry_url}</div>
+                        <div className="entry-content">
+                          <div className="entry-title">{e.title || 'Untitled'}</div>
+                          <div className="entry-url" title={e.entry_url}>{e.entry_url}</div>
                         </div>
                       </div>
                     ))
@@ -230,7 +235,7 @@ export default function M3UPlaylists({ onEntrySelected, onClose }) {
                 )}
               </>
             ) : (
-              <p className="m3u-empty">Select a playlist to view its entries</p>
+              <p className="empty-message">Select a playlist to view its entries</p>
             )}
           </div>
         </div>

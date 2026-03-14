@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { eventsAPI } from '../api/client'
-import M3UPlaylists from './M3UPlaylists'
-import PlaylistsManager from './PlaylistsManager'
+import PlaylistManager from './PlaylistManager'
 import './Schedule.css'
 
 // Convert Unix timestamp (seconds) to datetime-local format for input field
@@ -227,6 +226,7 @@ export default function Schedule({ username, onLogout }) {
                     <div className="form-group">
                       <label htmlFor="name">Event Name</label>
                       <input
+                        required
                         id="name"
                         type="text"
                         name="name"
@@ -238,6 +238,7 @@ export default function Schedule({ username, onLogout }) {
                     <div className="form-group">
                       <label htmlFor="start_time">Start Time</label>
                       <input
+                        required
                         id="start_time"
                         type="datetime-local"
                         name="start_time"
@@ -248,6 +249,7 @@ export default function Schedule({ username, onLogout }) {
                     <div className="form-group">
                       <label htmlFor="end_time">End Time</label>
                       <input
+                        required
                         id="end_time"
                         type="datetime-local"
                         name="end_time"
@@ -367,13 +369,13 @@ export default function Schedule({ username, onLogout }) {
         {/* Playlists Tab */}
         {activeTab === 'playlists' && (
           <div className="playlists-tab-content">
-            <PlaylistsManager />
+            <PlaylistManager onClose={() => setActiveTab('schedule')} />
           </div>
         )}
       </div>
 
       {showM3UModal && (
-        <M3UPlaylists
+        <PlaylistManager
           onEntrySelected={handleSelectM3UEntry}
           onClose={() => setShowM3UModal(false)}
         />
