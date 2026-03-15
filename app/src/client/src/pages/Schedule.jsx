@@ -183,9 +183,9 @@ export default function Schedule({ username, onLogout }) {
       <div className="schedule-header">
         <div>
           <h1>Scheduler</h1>
-          <p className="user-info">Logged in as: <strong>{username}</strong></p>
+          <p className="schedule-user-info">Logged in as: <strong>{username}</strong></p>
         </div>
-        <button className="logout-btn" onClick={onLogout}>Logout</button>
+        <button className="schedule-logout-btn" onClick={onLogout}>Logout</button>
       </div>
 
       {/* Tabs */}
@@ -210,7 +210,7 @@ export default function Schedule({ username, onLogout }) {
           <>
             <div className="schedule-sidebar">
               <button
-                className="new-event-btn"
+                className="schedule-new-event-btn"
                 onClick={() => {
                   resetForm()
                   setShowForm(true)
@@ -220,10 +220,10 @@ export default function Schedule({ username, onLogout }) {
               </button>
 
               {showForm && (
-                <div className="form-box">
+                <div className="schedule-form-box">
                   <h2>{editingId ? 'Edit Event' : 'Create Event'}</h2>
                   <form onSubmit={handleSubmit}>
-                    <div className="form-group">
+                    <div className="schedule-form-group">
                       <label htmlFor="name">Event Name</label>
                       <input
                         required
@@ -235,7 +235,7 @@ export default function Schedule({ username, onLogout }) {
                         placeholder="e.g., Team Meeting"
                       />
                     </div>
-                    <div className="form-group">
+                    <div className="schedule-form-group">
                       <label htmlFor="start_time">Start Time</label>
                       <input
                         required
@@ -246,7 +246,7 @@ export default function Schedule({ username, onLogout }) {
                         onChange={handleInputChange}
                       />
                     </div>
-                    <div className="form-group">
+                    <div className="schedule-form-group">
                       <label htmlFor="end_time">End Time</label>
                       <input
                         required
@@ -259,23 +259,23 @@ export default function Schedule({ username, onLogout }) {
                     </div>
 
                     {/* M3U Entry Selection */}
-                    <div className="form-group">
+                    <div className="schedule-form-group">
                       <label>M3U Entry</label>
                       {selectedM3UEntry ? (
-                        <div className="m3u-selected">
-                          <div className="m3u-selected-title">{selectedM3UEntry.title}</div>
-                          <div className="m3u-selected-url">{selectedM3UEntry.url}</div>
-                          <div className="m3u-selected-actions">
+                        <div className="schedule-playlist-selected">
+                          <div className="schedule-playlist-selected-title">{selectedM3UEntry.title}</div>
+                          <div className="schedule-playlist-selected-url">{selectedM3UEntry.url}</div>
+                          <div className="schedule-playlist-selected-actions">
                             <button
                               type="button"
-                              className="m3u-change-btn"
+                              className="schedule-playlist-change-btn"
                               onClick={() => setShowM3UModal(true)}
                             >
                               Change
                             </button>
                             <button
                               type="button"
-                              className="m3u-clear-btn"
+                              className="schedule-playlist-clear-btn"
                               onClick={() => {
                                 setSelectedM3UEntry(null)
                                 setFormData(prev => ({ ...prev, m3u_entry_id: null }))
@@ -288,7 +288,7 @@ export default function Schedule({ username, onLogout }) {
                       ) : (
                         <button
                           type="button"
-                          className="m3u-select-btn"
+                          className="schedule-playlist-select-btn"
                           onClick={() => setShowM3UModal(true)}
                         >
                           Select M3U Entry
@@ -296,10 +296,10 @@ export default function Schedule({ username, onLogout }) {
                       )}
                     </div>
 
-                    {error && <div className="error-message">{error}</div>}
-                    <div className="form-buttons">
+                    {error && <div className="schedule-error-message">{error}</div>}
+                    <div className="schedule-form-buttons">
                       <button type="submit">{editingId ? 'Update' : 'Create'}</button>
-                      <button type="button" onClick={resetForm} className="cancel-btn">Cancel</button>
+                      <button type="button" onClick={resetForm} className="schedule-cancel-btn">Cancel</button>
                     </div>
                   </form>
                 </div>
@@ -311,21 +311,21 @@ export default function Schedule({ username, onLogout }) {
               {loading ? (
                 <p>Loading events...</p>
               ) : events.length === 0 ? (
-                <p className="no-events">No events scheduled yet</p>
+                <p className="schedule-no-events">No events scheduled yet</p>
               ) : (
-                <div className="events-list">
+                <div className="schedule-events-list">
                   {events.map(event => (
-                    <div key={event.id} className="event-card">
-                      <div className="event-info">
+                    <div key={event.id} className="schedule-event-card">
+                      <div className="schedule-event-info">
                         <h3>{event.name}</h3>
-                        <p className="event-time">
+                        <p className="schedule-event-time">
                           <span className="time-label">Start:&nbsp;</span>{formatDateTime(event.start_time)}
                         </p>
-                        <p className="event-time">
+                        <p className="schedule-event-time">
                           <span className="time-label">End:&nbsp;</span>{formatDateTime(event.end_time)}
                         </p>
                         {event.entry_url && (
-                          <p className="event-m3u">
+                          <p className="schedule-event-playlist-entry">
                             <span className="time-label">Stream:&nbsp;</span>
                             <a href={event.entry_url} target="_blank" rel="noopener noreferrer" title={event.entry_url}>
                               {event.m3u_title || 'View'}
@@ -341,22 +341,22 @@ export default function Schedule({ username, onLogout }) {
                           </div>
                         )}
                         {event.recording_file && (
-                          <p className="event-filename">
+                          <p className="schedule-event-filename">
                             <span className="time-label">File:&nbsp;</span>
                             <span title={event.recording_file}>{event.recording_file}</span>
                           </p>
                         )}
                       </div>
-                      <div className="event-actions">
+                      <div className="schedule-event-actions">
                         <button 
-                          className="edit-btn" 
+                          className="schedule-edit-btn" 
                           onClick={() => handleEdit(event)}
                           disabled={!isEventEditable(event)}
                           title={getEditButtonTitle(event)}
                         >
                           Edit
                         </button>
-                        <button className="delete-btn" onClick={() => handleDelete(event.id)}>Delete</button>
+                        <button className="schedule-delete-btn" onClick={() => handleDelete(event.id)}>Delete</button>
                       </div>
                     </div>
                   ))}

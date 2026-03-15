@@ -36,7 +36,7 @@ export default function Login({ onLoginSuccess }) {
       <div className="login-box">
         <h1>Scheduler</h1>
         <form onSubmit={handleLogin}>
-          <div className="form-group">
+          <div className="login-form-group">
             <label htmlFor="username">Username</label>
             <input required
               id="username"
@@ -48,7 +48,7 @@ export default function Login({ onLoginSuccess }) {
               disabled={loading}
             />
           </div>
-          <div className="form-group">
+          <div className="login-form-group">
             <label htmlFor="password">Password</label>
             <input required
               id="password"
@@ -60,7 +60,7 @@ export default function Login({ onLoginSuccess }) {
               disabled={loading}
             />
           </div>
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className="login-error-message">{error}</div>}
           <button type="submit" disabled={loading}>
             {loading ? '⏳' : 'Login'}
           </button>

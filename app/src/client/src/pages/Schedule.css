@@ -21,18 +21,18 @@
   color: #333;
 }
 
-.user-info {
+.schedule-user-info {
   margin: 5px 0 0 0;
   color: #666;
   font-size: 14px;
 }
 
-.logout-btn {
+.schedule-logout-btn {
   background-color: #f44336;
   padding: 10px 20px;
 }
 
-.logout-btn:hover {
+.schedule-logout-btn:hover {
   background-color: #da190b;
 }
 
@@ -81,32 +81,32 @@
   gap: 15px;
 }
 
-.new-event-btn {
+.schedule-new-event-btn {
   width: 100%;
   padding: 14px;
   font-size: 16px;
   font-weight: 600;
 }
 
-.form-box {
+.schedule-form-box {
   background: white;
   padding: 20px;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.form-box h2 {
+.schedule-form-box h2 {
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 18px;
   color: #333;
 }
 
-.form-group {
+.schedule-form-group {
   margin-bottom: 16px;
 }
 
-.form-group label {
+.schedule-form-group label {
   display: block;
   margin-bottom: 6px;
   font-weight: 500;
@@ -114,29 +114,29 @@
   font-size: 14px;
 }
 
-.form-group input {
+.schedule-form-group input {
   width: 100%;
 }
 
-.form-buttons {
+.schedule-form-buttons {
   display: flex;
   gap: 10px;
 }
 
-.form-buttons button {
+.schedule-form-buttons button {
   flex: 1;
   padding: 10px;
 }
 
-.cancel-btn {
+.schedule-cancel-btn {
   background-color: #999;
 }
 
-.cancel-btn:hover {
+.schedule-cancel-btn:hover {
   background-color: #777;
 }
 
-.error-message {
+.schedule-error-message {
   color: #d32f2f;
   background-color: #ffebee;
   padding: 10px;
@@ -156,20 +156,20 @@
   font-size: 22px;
 }
 
-.no-events {
+.schedule-no-events {
   text-align: center;
   color: #999;
   padding: 40px 20px;
   font-size: 16px;
 }
 
-.events-list {
+.schedule-events-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 15px;
 }
 
-.event-card {
+.schedule-event-card {
   background: white;
   padding: 20px;
   border-radius: 6px;
@@ -179,13 +179,13 @@
   gap: 15px;
 }
 
-.event-info h3 {
+.schedule-event-info h3 {
   margin: 0 0 12px 0;
   color: #333;
   font-size: 18px;
 }
 
-.event-time {
+.schedule-event-time {
   margin: 6px 0;
   color: #666;
   font-size: 13px;
@@ -197,23 +197,23 @@
   color: #333;
 }
 
-.event-m3u {
+.schedule-event-playlist-entry {
   margin: 8px 0;
   color: #0066cc;
   font-size: 13px;
 }
 
-.event-m3u a {
+.schedule-event-playlist-entry a {
   color: #0066cc;
   text-decoration: none;
   word-break: break-all;
 }
 
-.event-m3u a:hover {
+.schedule-event-playlist-entry a:hover {
   text-decoration: underline;
 }
 
-.m3u-selected {
+.schedule-playlist-selected {
   background-color: #f0f8ff;
   border: 1px solid #0066cc;
   border-radius: 4px;
@@ -221,7 +221,7 @@
   margin-bottom: 10px;
 }
 
-.m3u-selected-title {
+.schedule-playlist-selected-title {
   font-weight: 500;
   color: #333;
   font-size: 13px;
@@ -231,7 +231,7 @@
   text-overflow: ellipsis;
 }
 
-.m3u-selected-url {
+.schedule-playlist-selected-url {
   font-size: 11px;
   color: #666;
   font-family: monospace;
@@ -241,13 +241,13 @@
   margin-bottom: 8px;
 }
 
-.m3u-selected-actions {
+.schedule-playlist-selected-actions {
   display: flex;
   gap: 6px;
 }
 
-.m3u-change-btn,
-.m3u-clear-btn {
+.schedule-playlist-change-btn,
+.schedule-playlist-clear-btn {
   flex: 1;
   padding: 6px 8px;
   font-size: 12px;
@@ -256,25 +256,25 @@
   cursor: pointer;
 }
 
-.m3u-change-btn {
+.schedule-playlist-change-btn {
   background-color: #2196F3;
   color: white;
 }
 
-.m3u-change-btn:hover {
+.schedule-playlist-change-btn:hover {
   background-color: #1976D2;
 }
 
-.m3u-clear-btn {
+.schedule-playlist-clear-btn {
   background-color: #ddd;
   color: #333;
 }
 
-.m3u-clear-btn:hover {
+.schedule-playlist-clear-btn:hover {
   background-color: #ccc;
 }
 
-.m3u-select-btn {
+.schedule-playlist-select-btn {
   width: 100%;
   padding: 10px;
   background-color: #2196F3;
@@ -286,37 +286,37 @@
   font-weight: 500;
 }
 
-.m3u-select-btn:hover {
+.schedule-playlist-select-btn:hover {
   background-color: #1976D2;
 }
 
-.event-actions {
+.schedule-event-actions {
   display: flex;
   gap: 10px;
 }
 
-.edit-btn {
+.schedule-edit-btn {
   flex: 1;
   background-color: #2196F3;
 }
 
-.edit-btn:hover:not(:disabled) {
+.schedule-edit-btn:hover:not(:disabled) {
   background-color: #1976D2;
 }
 
-.edit-btn:disabled {
+.schedule-edit-btn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.delete-btn {
+.schedule-delete-btn {
   flex: 1;
   background-color: #f44336;
   color: white;
 }
 
-.delete-btn:hover {
+.schedule-delete-btn:hover {
   background-color: #da190b;
   color: white;
 }
@@ -368,7 +368,7 @@
   border: 1px solid #f5c6cb;
 }
 
-.event-filename {
+.schedule-event-filename {
   margin: 8px 0;
   color: #555;
   font-size: 12px;
@@ -388,7 +388,7 @@
     width: 100%;
   }
 
-  .events-list {
+  .schedule-events-list {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 }

@@ -115,17 +115,17 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
   }
 
   return (
-    <div className="m3u-modal">
-      <div className="m3u-modal-content">
-        <div className="m3u-modal-header">
+    <div className="playlist-modal">
+      <div className="playlist-modal-content">
+        <div className="playlist-modal-header">
           <h2>Playlists</h2>
-          <p className="playlists-description">Manage your playlist URLs and entries</p>
-          <button className="m3u-close-btn" onClick={onClose}>×</button>
+          <p className="playlist-description">Manage your playlist URLs and entries</p>
+          <button className="playlist-close-btn" onClick={onClose}>×</button>
         </div>
-        <div className="m3u-container">
+        <div className="playlist-container">
           {/* Left: Playlists */}
-          <div className="playlists-left">
-            <div className="add-playlist-section">
+          <div className="playlist-left">
+            <div className="playlist-section-add">
               <h3>Add Playlist</h3>
               <form onSubmit={handleAddPlaylist} className="playlist-add-form">
                 <input
@@ -150,12 +150,12 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
             </div>
 
             {/* Playlists List */}
-            <div className="playlists-list-section">
+            <div className="playlist-section-list">
               <h3>Your Playlists ({playlists.length})</h3>
-              <div className="playlists-list">
+              <div className="playlist-list">
                 {loading && playlists.length === 0 && <p>Loading...</p>}
                 {playlists.length === 0 ? (
-                  <p className="empty-message">No playlists</p>
+                  <p className="playlist-empty-message">No playlists</p>
                 ) : (
                   playlists.map(p => (
                     <div
@@ -199,27 +199,27 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
           </div>
 
           {/* Right: Entries */}
-          <div className="playlists-right">
+          <div className="playlist-right">
             <h3>Entries {selectedPlaylist && `(${entries.length})`}</h3>
             {selectedPlaylist ? (
               <>
-                <div className="entries-list">
+                <div className="playlist-entries-list">
                   {loading && <p>Loading...</p>}
                   {entries.length === 0 ? (
-                    <p className="empty-message">No entries</p>
+                    <p className="playlist-empty-message">No entries</p>
                   ) : (
                     entries.map(e => (
                       <div
                         key={e.id}
-                        className={`entry-item ${onEntrySelected && (selectedEntry === e.id) ? 'active' : ''}`}
+                        className={`playlist-entry-item ${onEntrySelected && (selectedEntry === e.id) ? 'active' : ''}`}
                         onClick={() => setSelectedEntry(e.id)}
                       >
                         {e.logo && (
-                          <img src={e.logo} alt="" className="entry-logo" onError={(e) => e.target.style.display = 'none'} />
+                          <img src={e.logo} alt="" className="playlist-entry-logo" onError={(e) => e.target.style.display = 'none'} />
                         )}
-                        <div className="entry-content">
-                          <div className="entry-title">{e.title || 'Untitled'}</div>
-                          <div className="entry-url" title={e.entry_url}>{e.entry_url}</div>
+                        <div className="playlist-entry-content">
+                          <div className="playlist-entry-title">{e.title || 'Untitled'}</div>
+                          <div className="playlist-entry-url" title={e.entry_url}>{e.entry_url}</div>
                         </div>
                       </div>
                     ))
@@ -227,20 +227,20 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
                 </div>
 
                 {selectedEntry && onEntrySelected && (
-                  <div className="m3u-actions">
-                    <button className="m3u-select-btn" onClick={handleSelectEntry}>
+                  <div className="playlist-entry-actions">
+                    <button className="playlist-entry-select-btn" onClick={handleSelectEntry}>
                       Select Entry
                     </button>
                   </div>
                 )}
               </>
             ) : (
-              <p className="empty-message">Select a playlist to view its entries</p>
+              <p className="playlist-empty-message">Select a playlist to view its entries</p>
             )}
           </div>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className="playlist-error-message">{error}</div>}
       </div>
     </div>
   )
