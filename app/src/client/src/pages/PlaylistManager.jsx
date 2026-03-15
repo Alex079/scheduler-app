@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react'
 import { playlistAPI } from '../api/client'
 import './PlaylistManager.css'
-
-// Convert Unix timestamp (seconds) to local time string
-const formatUnixTimestamp = (unixSeconds) => {
-  if (!unixSeconds) return 'Never'
-  return new Date(unixSeconds * 1000).toLocaleString()
-}
+import { unixSecondsToLocalTime } from '../utils/dates'
 
 export default function PlaylistManager({ onEntrySelected, onClose }) {
   const [playlists, setPlaylists] = useState([])
@@ -166,7 +161,7 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
                         <div className="playlist-name">{p.name}</div>
                         <div className="playlist-url" title={p.url}>{p.url}</div>
                         <div className="playlist-meta">
-                          Last refresh: {formatUnixTimestamp(p.last_refreshed)}
+                          Last refresh: {unixSecondsToLocalTime(p.last_refreshed)}
                         </div>
                       </div>
                       <div className="playlist-actions">

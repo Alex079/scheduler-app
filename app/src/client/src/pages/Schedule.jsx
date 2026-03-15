@@ -1,26 +1,8 @@
 import { useState, useEffect } from 'react'
 import { eventsAPI } from '../api/client'
+import { localIsoMinutesToUnixSeconds, unixSecondsToLocalTime, unixSecondsToLocalIsoMinutes } from '../utils/dates.js'
 import PlaylistManager from './PlaylistManager'
 import './Schedule.css'
-
-// Convert Unix timestamp (seconds) to datetime-local format for input field
-const unixToDatetimeLocal = (unixSeconds) => {
-  if (!unixSeconds) return ''
-  const date = new Date(unixSeconds * 1000)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${year}-${month}-${day}T${hours}:${minutes}`
-}
-
-// Convert datetime-local format to Unix timestamp (seconds) for API
-const datetimeLocalToUnix = (localString) => {
-  if (!localString) return null
-  const date = new Date(`${localString}:00`)
-  return Math.floor(date.getTime() / 1000)
-}
 
 export default function Schedule({ username, onLogout }) {
   const [activeTab, setActiveTab] = useState('schedule') // 'schedule' or 'playlists'
@@ -77,8 +59,8 @@ export default function Schedule({ username, onLogout }) {
 
     try {
       // Convert local datetime to Unix timestamp before sending to API
-      const start_time_unix = datetimeLocalToUnix(formData.start_time)
-      const end_time_unix = datetimeLocalToUnix(formData.end_time)
+      const start_time_unix = localIsoMinutesToUnixSeconds(formData.start_time)
+      const end_time_unix = localIsoMinutesToUnixSeconds(formData.end_time)
 
       if (editingId) {
         await eventsAPI.update(
@@ -109,8 +91,8 @@ export default function Schedule({ username, onLogout }) {
     setFormData({
       name: event.name,
       // Convert Unix timestamp to local datetime-local format for editing
-      start_time: unixToDatetimeLocal(event.start_time),
-      end_time: unixToDatetimeLocal(event.end_time),
+      start_time: unixSecondsToLocalIsoMinutes(event.start_time),
+      end_time: unixSecondsToLocalIsoMinutes(event.end_time),
       m3u_entry_id: event.m3u_entry_id,
     })
     if (event.m3u_entry_id) {
@@ -171,11 +153,6 @@ export default function Schedule({ username, onLogout }) {
     setShowForm(false)
     setShowM3UModal(false)
     setError('')
-  }
-
-  const formatDateTime = (unixSeconds) => {
-    if (!unixSeconds) return 'N/A'
-    return new Date(unixSeconds * 1000).toLocaleString()
   }
 
   return (
@@ -319,10 +296,10 @@ export default function Schedule({ username, onLogout }) {
                       <div className="schedule-event-info">
                         <h3>{event.name}</h3>
                         <p className="schedule-event-time">
-                          <span className="time-label">Start:&nbsp;</span>{formatDateTime(event.start_time)}
+                          <span className="time-label">Start:&nbsp;</span>{unixSecondsToLocalTime(event.start_time)}
                         </p>
                         <p className="schedule-event-time">
-                          <span className="time-label">End:&nbsp;</span>{formatDateTime(event.end_time)}
+                          <span className="time-label">End:&nbsp;</span>{unixSecondsToLocalTime(event.end_time)}
                         </p>
                         {event.entry_url && (
                           <p className="schedule-event-playlist-entry">
