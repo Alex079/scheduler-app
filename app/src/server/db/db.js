@@ -40,7 +40,7 @@ export function initializeDatabase() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS playlist_entries (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      playlist_id INTEGER NOT NULL,
+      playlist_id INTEGER,
       entry_url TEXT NOT NULL,
       title TEXT,
       logo TEXT,
