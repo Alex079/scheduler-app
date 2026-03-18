@@ -15,9 +15,10 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  width: 90%;
+  width: 90vw;
   max-width: 900px;
-  max-height: 80vh;
+  height: 90vh;
+  max-height: 900px;
   display: flex;
   flex-direction: column;
 }
@@ -56,8 +57,9 @@
 
 .playlist-container {
   display: flex;
+  flex-direction: row;
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
   gap: 20px;
   padding: 20px;
 }
@@ -95,7 +97,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0;
   overflow: hidden;
 }
 
@@ -150,6 +151,13 @@
   cursor: not-allowed;
 }
 
+.playlist-section-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .playlist-section-list h3 {
   margin: 0 0 12px 0;
   font-size: 16px;
@@ -158,11 +166,13 @@
 
 .playlist-list {
   flex: 1;
-  overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 4px;
   background: #f9f9f9;
-  padding: 4px;
+  padding: 8px;
+  overflow: scroll;
+  display: flex;
+  flex-direction: column;
 }
 
 .playlist-list > p {
@@ -261,11 +271,13 @@
 
 .playlist-entries-list {
   flex: 1;
-  overflow-y: auto;
+  display: flex;
+  overflow: scroll;
   border: 1px solid #ddd;
   border-radius: 4px;
   background: #f9f9f9;
   padding: 8px;
+  flex-direction: column;
 }
 
 .playlist-entries-list > p {
@@ -276,6 +288,7 @@
 }
 
 .playlist-entry-item {
+  cursor: pointer;
   padding: 10px 12px;
   margin-bottom: 8px;
   background: white;
@@ -354,11 +367,5 @@
 @media (max-width: 1024px) {
   .playlist-container {
     flex-direction: column;
-    gap: 15px;
-  }
-
-  .playlist-left,
-  .playlist-right {
-    max-height: 50%;
   }
 }
