@@ -36,36 +36,6 @@
   background-color: #da190b;
 }
 
-/* Tabs */
-.tabs-header {
-  display: flex;
-  background-color: white;
-  border-bottom: 2px solid #ddd;
-  padding: 0 30px;
-}
-
-.tab-btn {
-  padding: 16px 24px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  color: #666;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s;
-  margin-bottom: -2px;
-}
-
-.tab-btn:hover {
-  color: #333;
-}
-
-.tab-btn.active {
-  color: #2196F3;
-  border-bottom-color: #2196F3;
-}
-
 .schedule-content {
   display: flex;
   flex: 1;
@@ -73,6 +43,44 @@
   gap: 20px;
   padding: 20px;
 }
+
+.schedule-header-playlist-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.schedule-header-playlist-btn:hover {
+  border-color: #999;
+  color: #333;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-right-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.schedule-user-info {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  text-align: right;
+}
+
 
 .schedule-sidebar {
   width: 350px;
@@ -321,11 +329,7 @@
   color: white;
 }
 
-.playlists-tab-content {
-  flex: 1;
-  overflow: hidden;
-  width: 100%;
-}
+
 
 .recording-status-container {
   display: flex;

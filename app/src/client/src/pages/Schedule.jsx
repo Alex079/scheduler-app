@@ -5,7 +5,8 @@ import PlaylistManager from './PlaylistManager'
 import './Schedule.css'
 
 export default function Schedule({ username, onLogout }) {
-  const [activeTab, setActiveTab] = useState('schedule') // 'schedule' or 'playlists'
+  const [showPlaylistManager, setShowPlaylistManager] = useState(false)
+
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -158,197 +159,180 @@ export default function Schedule({ username, onLogout }) {
   return (
     <div className="schedule-container">
       <div className="schedule-header">
-        <div>
+        <div className="header-left">
           <h1>Scheduler</h1>
-          <p className="schedule-user-info">Logged in as: <strong>{username}</strong></p>
+          <button
+            className="schedule-header-playlist-btn"
+            onClick={() => setShowPlaylistManager(true)}
+          >
+            Manage Playlists
+          </button>
         </div>
-        <button className="schedule-logout-btn" onClick={onLogout}>Logout</button>
-      </div>
-
-      {/* Tabs */}
-      <div className="tabs-header">
-        <button
-          className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
-          onClick={() => setActiveTab('schedule')}
-        >
-          Schedule
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'playlists' ? 'active' : ''}`}
-          onClick={() => setActiveTab('playlists')}
-        >
-          M3U Playlists
-        </button>
+        <div className="header-right-group">
+          <p className="schedule-user-info">Logged in as: <strong>{username}</strong></p>
+          <button className="schedule-logout-btn" onClick={onLogout}>Logout</button>
+        </div>
       </div>
 
       <div className="schedule-content">
-        {/* Schedule Tab */}
-        {activeTab === 'schedule' && (
-          <>
-            <div className="schedule-sidebar">
-              <button
-                className="schedule-new-event-btn"
-                onClick={() => {
-                  resetForm()
-                  setShowForm(true)
-                }}
-              >
-                + New Event
-              </button>
+        {/* Schedule content */}
+        <div className="schedule-sidebar">
 
-              {showForm && (
-                <div className="schedule-form-box">
-                  <h2>{editingId ? 'Edit Event' : 'Create Event'}</h2>
-                  <form onSubmit={handleSubmit}>
-                    <div className="schedule-form-group">
-                      <label htmlFor="name">Event Name</label>
-                      <input
-                        required
-                        id="name"
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        placeholder="e.g., Team Meeting"
-                      />
-                    </div>
-                    <div className="schedule-form-group">
-                      <label htmlFor="start_time">Start Time</label>
-                      <input
-                        required
-                        id="start_time"
-                        type="datetime-local"
-                        name="start_time"
-                        value={formData.start_time}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    <div className="schedule-form-group">
-                      <label htmlFor="end_time">End Time</label>
-                      <input
-                        required
-                        id="end_time"
-                        type="datetime-local"
-                        name="end_time"
-                        value={formData.end_time}
-                        onChange={handleInputChange}
-                      />
-                    </div>
+          <button
+            className="schedule-new-event-btn"
+            onClick={() => {
+              resetForm()
+              setShowForm(true)
+            }}
+          >
+            + New Event
+          </button>
 
-                    {/* M3U Entry Selection */}
-                    <div className="schedule-form-group">
-                      <label>M3U Entry</label>
-                      {selectedM3UEntry ? (
-                        <div className="schedule-playlist-selected">
-                          <div className="schedule-playlist-selected-title">{selectedM3UEntry.title}</div>
-                          <div className="schedule-playlist-selected-url">{selectedM3UEntry.url}</div>
-                          <div className="schedule-playlist-selected-actions">
-                            <button
-                              type="button"
-                              className="schedule-playlist-change-btn"
-                              onClick={() => setShowM3UModal(true)}
-                            >
-                              Change
-                            </button>
-                            <button
-                              type="button"
-                              className="schedule-playlist-clear-btn"
-                              onClick={() => {
-                                setSelectedM3UEntry(null)
-                                setFormData(prev => ({ ...prev, m3u_entry_id: null }))
-                              }}
-                            >
-                              Clear
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
+          {showForm && (
+            <div className="schedule-form-box">
+              <h2>{editingId ? 'Edit Event' : 'Create Event'}</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="schedule-form-group">
+                  <label htmlFor="name">Event Name</label>
+                  <input
+                    required
+                    id="name"
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="e.g., Team Meeting"
+                  />
+                </div>
+                <div className="schedule-form-group">
+                  <label htmlFor="start_time">Start Time</label>
+                  <input
+                    required
+                    id="start_time"
+                    type="datetime-local"
+                    name="start_time"
+                    value={formData.start_time}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="schedule-form-group">
+                  <label htmlFor="end_time">End Time</label>
+                  <input
+                    required
+                    id="end_time"
+                    type="datetime-local"
+                    name="end_time"
+                    value={formData.end_time}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                {/* M3U Entry Selection */}
+                <div className="schedule-form-group">
+                  <label>M3U Entry</label>
+                  {selectedM3UEntry ? (
+                    <div className="schedule-playlist-selected">
+                      <div className="schedule-playlist-selected-title">{selectedM3UEntry.title}</div>
+                      <div className="schedule-playlist-selected-url">{selectedM3UEntry.url}</div>
+                      <div className="schedule-playlist-selected-actions">
                         <button
                           type="button"
-                          className="schedule-playlist-select-btn"
+                          className="schedule-playlist-change-btn"
                           onClick={() => setShowM3UModal(true)}
                         >
-                          Select M3U Entry
+                          Change
                         </button>
-                      )}
-                    </div>
-
-                    {error && <div className="schedule-error-message">{error}</div>}
-                    <div className="schedule-form-buttons">
-                      <button type="submit">{editingId ? 'Update' : 'Create'}</button>
-                      <button type="button" onClick={resetForm} className="schedule-cancel-btn">Cancel</button>
-                    </div>
-                  </form>
-                </div>
-              )}
-            </div>
-
-            <div className="schedule-main">
-              <h2>Shared Schedule</h2>
-              {loading ? (
-                <p>Loading events...</p>
-              ) : events.length === 0 ? (
-                <p className="schedule-no-events">No events scheduled yet</p>
-              ) : (
-                <div className="schedule-events-list">
-                  {events.map(event => (
-                    <div key={event.id} className="schedule-event-card">
-                      <div className="schedule-event-info">
-                        <h3>{event.name}</h3>
-                        <p className="schedule-event-time">
-                          <span className="time-label">Start:&nbsp;</span>{unixSecondsToLocalTime(event.start_time)}
-                        </p>
-                        <p className="schedule-event-time">
-                          <span className="time-label">End:&nbsp;</span>{unixSecondsToLocalTime(event.end_time)}
-                        </p>
-                        {event.entry_url && (
-                          <p className="schedule-event-playlist-entry">
-                            <span className="time-label">Stream:&nbsp;</span>
-                            <a href={event.entry_url} target="_blank" rel="noopener noreferrer" title={event.entry_url}>
-                              {event.m3u_title || 'View'}
-                            </a>
-                          </p>
-                        )}
-                        {event.recording_status && (
-                          <div className="recording-status-container">
-                            <span className="time-label">Recording:&nbsp;</span>
-                            <span className={`recording-status recording-status-${event.recording_status}`}>
-                              {event.recording_status.charAt(0).toUpperCase() + event.recording_status.slice(1)}
-                            </span>
-                          </div>
-                        )}
-                        {event.recording_file && (
-                          <p className="schedule-event-filename">
-                            <span className="time-label">File:&nbsp;</span>
-                            <span title={event.recording_file}>{event.recording_file}</span>
-                          </p>
-                        )}
-                      </div>
-                      <div className="schedule-event-actions">
-                        <button 
-                          className="schedule-edit-btn" 
-                          onClick={() => handleEdit(event)}
-                          disabled={!isEventEditable(event)}
-                          title={getEditButtonTitle(event)}
+                        <button
+                          type="button"
+                          className="schedule-playlist-clear-btn"
+                          onClick={() => {
+                            setSelectedM3UEntry(null)
+                            setFormData(prev => ({ ...prev, m3u_entry_id: null }))
+                          }}
                         >
-                          Edit
+                          Clear
                         </button>
-                        <button className="schedule-delete-btn" onClick={() => handleDelete(event.id)}>Delete</button>
                       </div>
                     </div>
-                  ))}
+                  ) : (
+                    <button
+                      type="button"
+                      className="schedule-playlist-select-btn"
+                      onClick={() => setShowM3UModal(true)}
+                    >
+                      Select M3U Entry
+                    </button>
+                  )}
                 </div>
-              )}
-            </div>
-          </>
-        )}
 
-        {/* Playlists Tab */}
-        {activeTab === 'playlists' && (
-          <div className="playlists-tab-content">
-            <PlaylistManager onClose={() => setActiveTab('schedule')} />
-          </div>
-        )}
+                {error && <div className="schedule-error-message">{error}</div>}
+                <div className="schedule-form-buttons">
+                  <button type="submit">{editingId ? 'Update' : 'Create'}</button>
+                  <button type="button" onClick={resetForm} className="schedule-cancel-btn">Cancel</button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+
+        <div className="schedule-main">
+
+          <h2>Shared Schedule</h2>
+          {loading ? (
+            <p>Loading events...</p>
+          ) : events.length === 0 ? (
+            <p className="schedule-no-events">No events scheduled yet</p>
+          ) : (
+            <div className="schedule-events-list">
+              {events.map(event => (
+                <div key={event.id} className="schedule-event-card">
+                  <div className="schedule-event-info">
+                    <h3>{event.name}</h3>
+                    <p className="schedule-event-time">
+                      <span className="time-label">Start:&nbsp;</span>{unixSecondsToLocalTime(event.start_time)}
+                    </p>
+                    <p className="schedule-event-time">
+                      <span className="time-label">End:&nbsp;</span>{unixSecondsToLocalTime(event.end_time)}
+                    </p>
+                    {event.entry_url && (
+                      <p className="schedule-event-playlist-entry">
+                        <span className="time-label">Stream:&nbsp;</span>
+                        <a href={event.entry_url} target="_blank" rel="noopener noreferrer" title={event.entry_url}>
+                          {event.m3u_title || 'View'}
+                        </a>
+                      </p>
+                    )}
+                    {event.recording_status && (
+                      <div className="recording-status-container">
+                        <span className="time-label">Recording:&nbsp;</span>
+                        <span className={`recording-status recording-status-${event.recording_status}`}>
+                          {event.recording_status.charAt(0).toUpperCase() + event.recording_status.slice(1)}
+                        </span>
+                      </div>
+                    )}
+                    {event.recording_file && (
+                      <p className="schedule-event-filename">
+                        <span className="time-label">File:&nbsp;</span>
+                        <span title={event.recording_file}>{event.recording_file}</span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="schedule-event-actions">
+                    <button
+                      className="schedule-edit-btn"
+                      onClick={() => handleEdit(event)}
+                      disabled={!isEventEditable(event)}
+                      title={getEditButtonTitle(event)}
+                    >
+                      Edit
+                    </button>
+                    <button className="schedule-delete-btn" onClick={() => handleDelete(event.id)}>Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {showM3UModal && (
@@ -357,6 +341,10 @@ export default function Schedule({ username, onLogout }) {
           onClose={() => setShowM3UModal(false)}
         />
       )}
+      {showPlaylistManager && (
+        <PlaylistManager onClose={() => setShowPlaylistManager(false)} />
+      )}
     </div>
   )
 }
+
