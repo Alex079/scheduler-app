@@ -21,8 +21,8 @@ export const authAPI = {
 
 export const eventsAPI = {
   getAll: () => client.get('/events'),
-  create: (name, start_time, end_time, m3u_entry_id) => client.post('/events', { name, start_time, end_time, m3u_entry_id }),
-  update: (id, name, start_time, end_time, m3u_entry_id) => client.put(`/events/${id}`, { name, start_time, end_time, m3u_entry_id }),
+  create: (name, start_time, end_time, playlist_entry_id) => client.post('/events', { name, start_time, end_time, playlist_entry_id }),
+  update: (id, name, start_time, end_time, playlist_entry_id) => client.put(`/events/${id}`, { name, start_time, end_time, playlist_entry_id }),
   delete: (id) => client.delete(`/events/${id}`),
 };
 

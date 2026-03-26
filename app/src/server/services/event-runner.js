@@ -43,13 +43,13 @@ function sanitizeFilename(str) {
 
 /**
  * Build recording command for an event
- * @param {Object} event - Event object with name, start_time, end_time, m3u_entry_id
- * @param {Object} entry - M3U entry object with entry_url, title
+ * @param {Object} event - Event object with name, start_time, end_time, playlist_entry_id
+ * @param {Object} entry - Playlist entry object with entry_url, title
  * @returns {Object} { command: string, filename: string }
  */
 function buildCommand(event) {
   if (!event.entry_url) {
-    throw new Error('Event is missing M3U stream URL');
+    throw new Error('Event is missing Playlist stream URL');
   }
 
   const streamUrl = event.entry_url;
@@ -60,7 +60,7 @@ function buildCommand(event) {
   const duration = event.end_time - event.start_time; // in seconds
 
   const filename = `${startFormatted}_${endFormatted}_${streamName}_${eventName}.mp4`;
-  
+
   const command = `ID=${event.id} STREAM=${streamUrl} DURATION=${duration} OUTPUT=${filename}`;
 
   return { command, filename };

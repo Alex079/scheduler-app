@@ -36,7 +36,7 @@ export function initializeDatabase() {
     )
   `);
 
-  // Create M3U entries table (parsed URLs from playlists)
+  // Create Playlist entries table (parsed URLs from playlists)
   db.exec(`
     CREATE TABLE IF NOT EXISTS playlist_entries (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,13 +56,13 @@ export function initializeDatabase() {
       name TEXT NOT NULL,
       start_time INTEGER NOT NULL,
       end_time INTEGER NOT NULL,
-      m3u_entry_id INTEGER NOT NULL,
+      playlist_entry_id INTEGER NOT NULL,
       created_by INTEGER NOT NULL,
       created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
       recording_file TEXT,
       recording_status TEXT,
       FOREIGN KEY (created_by) REFERENCES users(id),
-      FOREIGN KEY (m3u_entry_id) REFERENCES playlist_entries(id)
+      FOREIGN KEY (playlist_entry_id) REFERENCES playlist_entries(id)
     )
   `);
 
@@ -97,32 +97,32 @@ export function getAllEvents() {
         e.name, 
         e.start_time, 
         e.end_time, 
-        e.m3u_entry_id,
+        e.playlist_entry_id,
         e.created_by,
         e.created_at,
         e.recording_file,
         e.recording_status,
         m.entry_url,
-        m.title as m3u_title
+        m.title as entry_title
       FROM events e
-      INNER JOIN playlist_entries m ON e.m3u_entry_id = m.id
+      INNER JOIN playlist_entries m ON e.playlist_entry_id = m.id
       ORDER BY e.start_time`)
     .all() || [];
 }
 
-export function createNewEvent(name, start_time, end_time, m3u_entry_id, created_by) {
+export function createNewEvent(name, start_time, end_time, playlist_entry_id, created_by) {
   const id = db
-    .prepare('INSERT INTO events (name, start_time, end_time, m3u_entry_id, created_by) VALUES (?, ?, ?, ?, ?)')
-    .run(name, start_time, end_time, m3u_entry_id, created_by)
+    .prepare('INSERT INTO events (name, start_time, end_time, playlist_entry_id, created_by) VALUES (?, ?, ?, ?, ?)')
+    .run(name, start_time, end_time, playlist_entry_id, created_by)
     .lastInsertRowid;
-  return { id, name, start_time, end_time, m3u_entry_id, created_by };
+  return { id, name, start_time, end_time, playlist_entry_id, created_by };
 }
 
-export function updateEvent(id, name, start_time, end_time, m3u_entry_id) {
+export function updateEvent(id, name, start_time, end_time, playlist_entry_id) {
   const changes = db
-    .prepare('UPDATE events SET name = ?, start_time = ?, end_time = ?, m3u_entry_id = ?, recording_status = NULL WHERE id = ?')
-    .run(name, start_time, end_time, m3u_entry_id, id);
-  return (changes === 0) ? null : { id, name, start_time, end_time, m3u_entry_id };
+    .prepare('UPDATE events SET name = ?, start_time = ?, end_time = ?, playlist_entry_id = ?, recording_status = NULL WHERE id = ?')
+    .run(name, start_time, end_time, playlist_entry_id, id);
+  return (changes === 0) ? null : { id, name, start_time, end_time, playlist_entry_id };
 }
 
 export function deleteEvent(id) {
@@ -143,7 +143,7 @@ export function getUpcomingEvents() {
         m.entry_url,
         m.title as entry_title
       FROM events e
-      INNER JOIN playlist_entries m ON e.m3u_entry_id = m.id
+      INNER JOIN playlist_entries m ON e.playlist_entry_id = m.id
       WHERE e.start_time > ? AND e.start_time <= ? AND e.recording_status IS NULL
       ORDER BY e.start_time`)
     .all(now, now + oneDayInSeconds) || [];

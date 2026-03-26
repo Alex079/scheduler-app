@@ -6,20 +6,19 @@ import './Schedule.css'
 
 export default function Schedule({ username, onLogout }) {
   const [showPlaylistManager, setShowPlaylistManager] = useState(false)
-
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
-  const [showM3UModal, setShowM3UModal] = useState(false)
+  const [showPlaylistSelector, setShowPlaylistSelector] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     start_time: '',
     end_time: '',
-    m3u_entry_id: null,
+    playlist_entry_id: null,
   })
-  const [selectedM3UEntry, setSelectedM3UEntry] = useState(null)
+  const [selectedPlaylistEntry, setSelectedPlaylistEntry] = useState(null)
 
   useEffect(() => {
     loadEvents()
@@ -44,16 +43,16 @@ export default function Schedule({ username, onLogout }) {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSelectM3UEntry = (entry) => {
-    setSelectedM3UEntry(entry)
-    setFormData(prev => ({ ...prev, m3u_entry_id: entry.id }))
-    setShowM3UModal(false)
+  const handleSelectPlaylistEntry = (entry) => {
+    setSelectedPlaylistEntry(entry)
+    setFormData(prev => ({ ...prev, playlist_entry_id: entry.id }))
+    setShowPlaylistSelector(false)
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!formData.name || !formData.start_time || !formData.end_time || !formData.m3u_entry_id) {
+    if (!formData.name || !formData.start_time || !formData.end_time || !formData.playlist_entry_id) {
       setError('All fields are required')
       return
     }
@@ -69,14 +68,14 @@ export default function Schedule({ username, onLogout }) {
           formData.name,
           start_time_unix,
           end_time_unix,
-          formData.m3u_entry_id
+          formData.playlist_entry_id
         )
       } else {
         await eventsAPI.create(
           formData.name,
           start_time_unix,
           end_time_unix,
-          formData.m3u_entry_id
+          formData.playlist_entry_id
         )
       }
       resetForm()
@@ -94,20 +93,20 @@ export default function Schedule({ username, onLogout }) {
       // Convert Unix timestamp to local datetime-local format for editing
       start_time: unixSecondsToLocalIsoMinutes(event.start_time),
       end_time: unixSecondsToLocalIsoMinutes(event.end_time),
-      m3u_entry_id: event.m3u_entry_id,
+      playlist_entry_id: event.playlist_entry_id,
     })
-    if (event.m3u_entry_id) {
-      setSelectedM3UEntry({
-        id: event.m3u_entry_id,
+    if (event.playlist_entry_id) {
+      setSelectedPlaylistEntry({
+        id: event.playlist_entry_id,
         url: event.entry_url,
-        title: event.m3u_title,
+        title: event.entry_title,
       })
     } else {
-      setSelectedM3UEntry(null)
+      setSelectedPlaylistEntry(null)
     }
     setEditingId(event.id)
     setShowForm(true)
-    setShowM3UModal(false)
+    setShowPlaylistSelector(false)
   }
 
   const handleDelete = async (id) => {
@@ -147,12 +146,12 @@ export default function Schedule({ username, onLogout }) {
       name: '',
       start_time: '',
       end_time: '',
-      m3u_entry_id: null,
+      playlist_entry_id: null,
     })
-    setSelectedM3UEntry(null)
+    setSelectedPlaylistEntry(null)
     setEditingId(null)
     setShowForm(false)
-    setShowM3UModal(false)
+    setShowPlaylistSelector(false)
     setError('')
   }
 
@@ -165,11 +164,11 @@ export default function Schedule({ username, onLogout }) {
             className="schedule-header-playlist-btn"
             onClick={() => setShowPlaylistManager(true)}
           >
-            Manage Playlists
+            Playlists
           </button>
         </div>
         <div className="header-right-group">
-          <p className="schedule-user-info">Logged in as: <strong>{username}</strong></p>
+          <p className="schedule-user-info">User: <strong>{username}</strong></p>
           <button className="schedule-logout-btn" onClick={onLogout}>Logout</button>
         </div>
       </div>
@@ -227,18 +226,18 @@ export default function Schedule({ username, onLogout }) {
                   />
                 </div>
 
-                {/* M3U Entry Selection */}
+                {/* Playlist Entry Selection */}
                 <div className="schedule-form-group">
-                  <label>M3U Entry</label>
-                  {selectedM3UEntry ? (
+                  <label>Playlist Entry</label>
+                  {selectedPlaylistEntry ? (
                     <div className="schedule-playlist-selected">
-                      <div className="schedule-playlist-selected-title">{selectedM3UEntry.title}</div>
-                      <div className="schedule-playlist-selected-url">{selectedM3UEntry.url}</div>
+                      <div className="schedule-playlist-selected-title">{selectedPlaylistEntry.title}</div>
+                      <div className="schedule-playlist-selected-url">{selectedPlaylistEntry.url}</div>
                       <div className="schedule-playlist-selected-actions">
                         <button
                           type="button"
                           className="schedule-playlist-change-btn"
-                          onClick={() => setShowM3UModal(true)}
+                          onClick={() => setShowPlaylistSelector(true)}
                         >
                           Change
                         </button>
@@ -246,8 +245,8 @@ export default function Schedule({ username, onLogout }) {
                           type="button"
                           className="schedule-playlist-clear-btn"
                           onClick={() => {
-                            setSelectedM3UEntry(null)
-                            setFormData(prev => ({ ...prev, m3u_entry_id: null }))
+                            setSelectedPlaylistEntry(null)
+                            setFormData(prev => ({ ...prev, playlist_entry_id: null }))
                           }}
                         >
                           Clear
@@ -258,9 +257,9 @@ export default function Schedule({ username, onLogout }) {
                     <button
                       type="button"
                       className="schedule-playlist-select-btn"
-                      onClick={() => setShowM3UModal(true)}
+                      onClick={() => setShowPlaylistSelector(true)}
                     >
-                      Select M3U Entry
+                      Select Playlist Entry
                     </button>
                   )}
                 </div>
@@ -298,7 +297,7 @@ export default function Schedule({ username, onLogout }) {
                       <p className="schedule-event-playlist-entry">
                         <span className="time-label">Stream:&nbsp;</span>
                         <a href={event.entry_url} target="_blank" rel="noopener noreferrer" title={event.entry_url}>
-                          {event.m3u_title || 'View'}
+                          {event.entry_title || 'View'}
                         </a>
                       </p>
                     )}
@@ -335,10 +334,10 @@ export default function Schedule({ username, onLogout }) {
         </div>
       </div>
 
-      {showM3UModal && (
+      {showPlaylistSelector && (
         <PlaylistManager
-          onEntrySelected={handleSelectM3UEntry}
-          onClose={() => setShowM3UModal(false)}
+          onEntrySelected={handleSelectPlaylistEntry}
+          onClose={() => setShowPlaylistSelector(false)}
         />
       )}
       {showPlaylistManager && (
