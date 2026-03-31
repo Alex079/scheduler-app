@@ -372,6 +372,12 @@
   border: 1px solid #f5c6cb;
 }
 
+.recording-status-missed {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
 .schedule-event-filename {
   margin: 8px 0;
   color: #555;

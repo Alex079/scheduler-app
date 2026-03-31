@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { getAllPlaylists, getPlaylistEntries, getPlaylistUrl, updatePlaylistEntries, updatePlaylistTime } from '../db/db.js';
+import { getAllOutdatedPlaylists, getPlaylistEntries, updatePlaylistEntries } from '../db/db.js';
 
 function parseM3U(content) {
   const lines = content.split('\n');
@@ -45,8 +45,8 @@ function parseExtinf(extinf) {
   return { logo, title };
 }
 
-export async function refreshPlaylist(playlistId) {
-  const newEntries = await fetch(getPlaylistUrl(playlistId))
+export async function refreshPlaylist(playlist) {
+  const newEntries = await fetch(playlist.url)
     .then(response => {
       if (response.ok) {
         return response.text();
@@ -55,14 +55,14 @@ export async function refreshPlaylist(playlistId) {
     })
     .then(parseM3U)
     .catch(error => {
-      console.error(`[PLAYLIST ${playlistId}] ✗ Failed to refresh:`, error.message);
+      console.error(`[PLAYLIST ${playlist.id}] ✗ Failed to refresh ${playlist.name}:`, error.message);
       return [];
     });
   if (newEntries.length === 0) {
-    console.warn(`[PLAYLIST ${playlistId}] ⚠️ No entries found after refresh`);
+    console.warn(`[PLAYLIST ${playlist.id}] ⚠️ No entries found after refresh ${playlist.name}`);
     return;
   }
-  const existingEntries = getPlaylistEntries(playlistId);
+  const existingEntries = getPlaylistEntries(playlist.id);
   const existingUrls = new Set(existingEntries.map(e => e.entry_url));
   const newUrls = new Set(newEntries.map(e => e.url));
 
@@ -70,17 +70,16 @@ export async function refreshPlaylist(playlistId) {
   const entriesToAdd = newEntries.filter(e => !existingUrls.has(e.url));
   const entriesToUpdate = newEntries.filter(e => existingUrls.has(e.url));
 
-  updatePlaylistEntries(playlistId, entriesToAdd, entriesToUpdate, entriesToDelete);
-  updatePlaylistTime(playlistId);
+  updatePlaylistEntries(playlist.id, entriesToAdd, entriesToUpdate, entriesToDelete);
   const summary = `[+${entriesToAdd.length} ~${entriesToUpdate.length} -${entriesToDelete.length}]`;
-  console.log(`[PLAYLIST ${playlistId}] ✓ Refreshed: ${summary} (total: ${newEntries.length})`);
+  console.log(`[PLAYLIST ${playlist.id}] ✓ Refreshed ${playlist.name}: ${summary} (total: ${newEntries.length})`);
 }
 
 export function startPlaylistScheduler() {
   console.log('Starting playlist scheduler...');
   function refreshAllPlaylists() {
-    getAllPlaylists().forEach(({ id }) => refreshPlaylist(id));
+    getAllOutdatedPlaylists().forEach(refreshPlaylist);
   }
   refreshAllPlaylists();
-  setInterval(refreshAllPlaylists, 24 * 60 * 60 * 1000); // Every 24 hours
+  setInterval(refreshAllPlaylists, 12 * 60 * 60 * 1000); // Every 12 hours
 }

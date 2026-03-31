@@ -1,4 +1,4 @@
-import { eventScheduled, eventStarted, eventCompleted, eventFailed, getUpcomingEvents } from '../db/db.js';
+import { eventScheduled, eventStarted, eventCompleted, eventFailed, getUpcomingEvents, eventMissed, getAllScheduledEvents } from '../db/db.js';
 import { createReadStream, createWriteStream } from 'fs';
 
 const requestStream = createWriteStream('/pipe/request');
@@ -75,7 +75,8 @@ function scheduleEventRecording(event) {
   const delay = (event.start_time - now) * 1000; // Convert to milliseconds
 
   if (delay < 0) {
-    console.log(`[EVENT ${event.id}] Skipping (already started): ${event.name}`);
+    console.log(`[EVENT ${event.id}] Skipping (missed start time): ${event.name}`);
+    eventMissed(event.id);
     return;
   }
 
@@ -98,11 +99,8 @@ function scheduleEventRecording(event) {
  */
 export function startEventScheduler() {
   console.log('Starting event scheduler...');
-  function checkUpcomingEvents() {
-    getUpcomingEvents().forEach(scheduleEventRecording);
-  }
-  checkUpcomingEvents();
-  setInterval(checkUpcomingEvents, 60 * 1000); // Every minute
+  getAllScheduledEvents().forEach(scheduleEventRecording); // reschedule on startup
+  setInterval(() => getUpcomingEvents().forEach(scheduleEventRecording), 60 * 1000); // Every minute
 }
 
 /**

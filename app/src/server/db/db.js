@@ -149,6 +149,24 @@ export function getUpcomingEvents() {
     .all(now, now + oneDayInSeconds) || [];
 }
 
+export function getAllScheduledEvents() {
+  return db
+    .prepare(
+      `SELECT 
+        e.id, 
+        e.name, 
+        e.start_time, 
+        e.end_time,
+        m.entry_url,
+        m.title as entry_title
+      FROM events e
+      INNER JOIN playlist_entries m ON e.playlist_entry_id = m.id
+      WHERE e.recording_status = 'scheduled'
+      ORDER BY e.start_time`)
+    .all() || [];
+}
+
+
 export function eventScheduled(id) {
   db.prepare('UPDATE events SET recording_status = ? WHERE id = ?').run('scheduled', id);
 }
@@ -165,8 +183,20 @@ export function eventFailed(id) {
   db.prepare('UPDATE events SET recording_status = ? WHERE id = ?').run('failed', id);
 }
 
+export function eventMissed(id) {
+  db.prepare('UPDATE events SET recording_status = ? WHERE id = ?').run('missed', id);
+}
+
 export function getAllPlaylists() {
   return db.prepare('SELECT id, name, url, last_refreshed FROM playlists').all() || [];
+}
+
+export function getAllOutdatedPlaylists() {
+  return db
+    .prepare(`
+      SELECT id, name, url FROM playlists
+      WHERE last_refreshed < (CAST(strftime('%s', 'now') AS INTEGER) - 86400)`)
+    .all() || [];
 }
 
 export function createNewPlaylist(url, name) {
@@ -182,21 +212,10 @@ export function deletePlaylist(playlistId) {
   return (changes === 0) ? { message: 'Playlist not found' } : { message: 'Playlist deleted' };
 }
 
-export function getPlaylistUrl(playlistId) {
-  return db.prepare('SELECT url FROM playlists WHERE id = ?').get(playlistId)?.url;
-}
-
 export function getPlaylistEntries(playlistId) {
   return db
     .prepare('SELECT id, entry_url, title, logo FROM playlist_entries WHERE playlist_id = ?')
     .all(playlistId) || [];
-}
-
-export function updatePlaylistTime(playlistId) {
-  const changes = db
-    .prepare(`UPDATE playlists SET last_refreshed = CAST(strftime('%s', 'now') AS INTEGER) WHERE id = ?`)
-    .run(playlistId);
-  return (changes === 0) ? { message: 'Playlist not found' } : { message: 'Playlist time updated' };
 }
 
 export function updatePlaylistEntries(playlistId, entriesToAdd, entriesToUpdate, entriesToDelete) {
@@ -213,4 +232,6 @@ export function updatePlaylistEntries(playlistId, entriesToAdd, entriesToUpdate,
   entriesToAdd.forEach(entry => {
     insertStmt.run(entry.title, entry.logo, playlistId, entry.url);
   });
+  db.prepare(`UPDATE playlists SET last_refreshed = CAST(strftime('%s', 'now') AS INTEGER) WHERE id = ?`)
+    .run(playlistId);
 }
