@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { eventsAPI } from '../api/client'
-import { localIsoMinutesToUnixSeconds, unixSecondsToLocalTime, unixSecondsToLocalIsoMinutes } from '../utils/dates.js'
+import { localIsoMinutesToUnixSeconds, unixSecondsToLocalIsoMinutes } from '../utils/dates.js'
 import PlaylistManager from './PlaylistManager'
 import './Schedule.css'
 
@@ -300,32 +300,43 @@ export default function Schedule({ username, onLogout }) {
               {events.map(event => (
                 <div key={event.id} className="schedule-event-card">
                   <div className="schedule-event-info">
-                    <h3>{event.name}</h3>
-                    <p className="schedule-event-time">
-                      <span className="time-label">Start:&nbsp;</span>{unixSecondsToLocalTime(event.start_time)}
-                    </p>
-                    <p className="schedule-event-time">
-                      <span className="time-label">End:&nbsp;</span>{unixSecondsToLocalTime(event.end_time)}
-                    </p>
-                    {event.entry_url && (
-                      <p className="schedule-event-playlist-entry">
-                        <span className="time-label">Stream:&nbsp;</span>
+                    <div className="event-header-row">
+                      <h3>{event.name}</h3>
+                      {event.recording_status && (
+                        <p
+                          title={event.recording_status.charAt(0).toUpperCase() + event.recording_status.slice(1)}
+                          className={`recording-status recording-status-${event.recording_status}`}
+                        >{(() => {
+                          const durationSeconds = event.end_time - event.start_time;
+                          const hours = Math.floor(durationSeconds / 3600);
+                          const minutes = Math.floor((durationSeconds % 3600) / 60);
+                          return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+                        })()}
+                        </p>)}
+                    </div>
+                    <div className="event-properties-row">
+                      <p className="schedule-event-property">
+                        <span className="time-label">Start:</span>{(() => {
+                          const date = new Date(event.start_time * 1000);
+                          return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        })()}
+                      </p>
+                      <p className="schedule-event-property">
+                        <span className="time-label">End:</span>{(() => {
+                          const date = new Date(event.end_time * 1000);
+                          return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        })()}
+                      </p>
+                      <p className="schedule-event-property">
+                        <span className="time-label">Stream:</span>
                         <a href={event.entry_url} target="_blank" rel="noopener noreferrer" title={event.entry_url}>
                           {event.entry_title || 'View'}
                         </a>
                       </p>
-                    )}
-                    {event.recording_status && (
-                      <div className="recording-status-container">
-                        <span className="time-label">Recording:&nbsp;</span>
-                        <span className={`recording-status recording-status-${event.recording_status}`}>
-                          {event.recording_status.charAt(0).toUpperCase() + event.recording_status.slice(1)}
-                        </span>
-                      </div>
-                    )}
+                    </div>
                     {event.recording_file && (
                       <p className="schedule-event-filename">
-                        <span className="time-label">File:&nbsp;</span>
+                        <span className="time-label">File:</span>
                         <span title={event.recording_file}>{event.recording_file}</span>
                       </p>
                     )}
