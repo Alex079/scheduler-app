@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Login from './pages/Login'
 import Schedule from './pages/Schedule'
+import './App.css'
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)

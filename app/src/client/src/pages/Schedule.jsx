@@ -4,14 +4,16 @@ import { localIsoMinutesToUnixSeconds, unixSecondsToLocalTime, unixSecondsToLoca
 import PlaylistManager from './PlaylistManager'
 import './Schedule.css'
 
+const PLAYLIST_SELECTOR = 'SELECTOR'
+const PLAYLIST_MANAGER = 'MANAGER'
+
 export default function Schedule({ username, onLogout }) {
-  const [showPlaylistManager, setShowPlaylistManager] = useState(false)
+  const [showPlaylist, setShowPlaylist] = useState(null)
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
-  const [showPlaylistSelector, setShowPlaylistSelector] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     start_time: '',
@@ -46,7 +48,7 @@ export default function Schedule({ username, onLogout }) {
   const handleSelectPlaylistEntry = (entry) => {
     setSelectedPlaylistEntry(entry)
     setFormData(prev => ({ ...prev, playlist_entry_id: entry.id }))
-    setShowPlaylistSelector(false)
+    setShowPlaylist(null)
   }
 
   const handleSubmit = async (e) => {
@@ -106,7 +108,7 @@ export default function Schedule({ username, onLogout }) {
     }
     setEditingId(event.id)
     setShowForm(true)
-    setShowPlaylistSelector(false)
+    setShowPlaylist(null)
   }
 
   const handleDelete = async (id) => {
@@ -151,8 +153,20 @@ export default function Schedule({ username, onLogout }) {
     setSelectedPlaylistEntry(null)
     setEditingId(null)
     setShowForm(false)
-    setShowPlaylistSelector(false)
+    setShowPlaylist(null)
     setError('')
+  }
+
+  const showPlaylistManager = () => {
+    setShowPlaylist(PLAYLIST_MANAGER);
+  }
+
+  const showPlaylistSelector = () => {
+    setShowPlaylist(PLAYLIST_SELECTOR);
+  }
+
+  const hidePlaylist = () => {
+    setShowPlaylist(null);
   }
 
   return (
@@ -162,7 +176,7 @@ export default function Schedule({ username, onLogout }) {
           <h1>Scheduler</h1>
           <button
             className="schedule-header-playlist-btn"
-            onClick={() => setShowPlaylistManager(true)}
+            onClick={showPlaylistManager}
           >
             Playlists
           </button>
@@ -237,7 +251,7 @@ export default function Schedule({ username, onLogout }) {
                         <button
                           type="button"
                           className="schedule-playlist-change-btn"
-                          onClick={() => setShowPlaylistSelector(true)}
+                          onClick={showPlaylistSelector}
                         >
                           Change
                         </button>
@@ -257,7 +271,7 @@ export default function Schedule({ username, onLogout }) {
                     <button
                       type="button"
                       className="schedule-playlist-select-btn"
-                      onClick={() => setShowPlaylistSelector(true)}
+                      onClick={showPlaylistSelector}
                     >
                       Select Playlist Entry
                     </button>
@@ -278,7 +292,7 @@ export default function Schedule({ username, onLogout }) {
 
           <h2>Shared Schedule</h2>
           {loading ? (
-            <p>Loading events...</p>
+            <p>⏳</p>
           ) : events.length === 0 ? (
             <p className="schedule-no-events">No events scheduled yet</p>
           ) : (
@@ -334,14 +348,12 @@ export default function Schedule({ username, onLogout }) {
         </div>
       </div>
 
-      {showPlaylistSelector && (
+      {showPlaylist && (
         <PlaylistManager
-          onEntrySelected={handleSelectPlaylistEntry}
-          onClose={() => setShowPlaylistSelector(false)}
+          onEntrySelected={showPlaylist === PLAYLIST_SELECTOR ? handleSelectPlaylistEntry : null}
+          onClose={hidePlaylist}
+          onLogout={onLogout}
         />
-      )}
-      {showPlaylistManager && (
-        <PlaylistManager onClose={() => setShowPlaylistManager(false)} />
       )}
     </div>
   )

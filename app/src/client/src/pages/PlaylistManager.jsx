@@ -3,7 +3,7 @@ import { playlistAPI } from '../api/client'
 import './PlaylistManager.css'
 import { unixSecondsToLocalTime } from '../utils/dates'
 
-export default function PlaylistManager({ onEntrySelected, onClose }) {
+export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) {
   const [playlists, setPlaylists] = useState([])
   const [entries, setEntries] = useState([])
   const [selectedPlaylist, setSelectedPlaylist] = useState(null)
@@ -27,6 +27,7 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
     } catch (err) {
       setError('Failed to load playlists')
       console.error(err)
+      if (err.status === 401) onLogout()
     } finally {
       setLoading(false)
     }
@@ -43,6 +44,7 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
     } catch (err) {
       setError('Failed to load entries')
       console.error(err)
+      if (err.status === 401) onLogout()
     } finally {
       setLoading(false)
     }
@@ -64,6 +66,8 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
       setError('')
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to add playlist')
+      console.error(err)
+      if (err.status === 401) onLogout()
     } finally {
       setAddingPlaylist(false)
     }
@@ -81,6 +85,8 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
       await loadPlaylists()
     } catch (err) {
       setError('Failed to delete playlist')
+      console.error(err)
+      if (err.status === 401) onLogout()
     }
   }
 
@@ -93,6 +99,8 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
       await loadPlaylists()
     } catch (err) {
       setError('Failed to refresh playlist')
+      console.error(err)
+      if (err.status === 401) onLogout()
     }
   }
 
@@ -148,9 +156,10 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
             <div className="playlist-section-list">
               <h3>Your Playlists ({playlists.length})</h3>
               <div className="playlist-list">
-                {loading && playlists.length === 0 && <p>Loading...</p>}
-                {playlists.length === 0 ? (
-                  <p className="playlist-empty-message">No playlists</p>
+                {loading ? (
+                  <p>⏳</p>
+                ) : playlists.length === 0 ? (
+                  <p className="playlist-empty-message">No playlists yet</p>
                 ) : (
                   playlists.map(p => (
                     <div
@@ -199,7 +208,7 @@ export default function PlaylistManager({ onEntrySelected, onClose }) {
             {selectedPlaylist ? (
               <>
                 <div className="playlist-entries-list">
-                  {loading && <p>Loading...</p>}
+                  {loading && <p>⏳</p>}
                   {entries.length === 0 ? (
                     <p className="playlist-empty-message">No entries</p>
                   ) : (
