@@ -2,124 +2,118 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--color-gray-50);
 }
 
 .schedule-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: white;
-  padding: 20px 30px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid #ddd;
+  background-color: var(--color-gray-50);
+  padding: var(--spacing-md) var(--spacing-2xl);
+  box-shadow: var(--shadow-header);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .schedule-header h1 {
   margin: 0;
-  font-size: 28px;
-  color: #333;
+  font-size: var(--h1);
+  color: var(--color-text-primary);
 }
 
 .schedule-user-info {
-  margin: 5px 0 0 0;
-  color: #666;
-  font-size: 14px;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--body-md);
+  text-align: right;
 }
 
 .schedule-logout-btn {
-  background-color: #f44336;
-  padding: 10px 20px;
+  background-color: var(--color-danger);
+  padding: var(--spacing-sm) var(--spacing-lg);
 }
 
 .schedule-logout-btn:hover {
-  background-color: #da190b;
+  background-color: var(--color-danger-hover);
 }
 
 .schedule-content {
   display: flex;
   flex: 1;
   overflow: hidden;
-  gap: 20px;
-  padding: 20px;
-}
-
-.schedule-header-playlist-btn {
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  background: transparent;
-  color: #666;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.schedule-header-playlist-btn:hover {
-  border-color: #999;
-  color: #333;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg) var(--spacing-xl);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--spacing-lg);
 }
 
 .header-right-group {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 5px;
+  gap: var(--spacing-5);
 }
 
-.schedule-user-info {
-  margin: 0;
-  color: #666;
-  font-size: 14px;
-  text-align: right;
+.schedule-header-playlist-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--body-md);
+  font-weight: var(--font-weight-medium);
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition-base);
 }
 
+.schedule-header-playlist-btn:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
 
 .schedule-sidebar {
   width: 350px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--spacing-lg);
 }
 
 .schedule-new-event-btn {
   width: 100%;
   padding: 14px;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--body-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .schedule-form-box {
-  background: white;
-  padding: 20px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--color-gray-50);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-card);
 }
 
 .schedule-form-box h2 {
   margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 18px;
-  color: #333;
+  margin-bottom: var(--spacing-xl);
+  font-size: var(--h3);
+  color: var(--color-text-primary);
 }
 
 .schedule-form-group {
-  margin-bottom: 16px;
+  margin-bottom: var(--spacing-lg);
 }
 
 .schedule-form-group label {
   display: block;
-  margin-bottom: 6px;
-  font-weight: 500;
-  color: #555;
-  font-size: 14px;
+  margin-bottom: var(--spacing-6);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-800);
+  font-size: var(--body-md);
 }
 
 .schedule-form-group input {
@@ -128,29 +122,29 @@
 
 .schedule-form-buttons {
   display: flex;
-  gap: 10px;
+  gap: var(--spacing-10);
 }
 
 .schedule-form-buttons button {
   flex: 1;
-  padding: 10px;
+  padding: var(--spacing-sm);
 }
 
 .schedule-cancel-btn {
-  background-color: #999;
+  background-color: var(--color-gray-600);
 }
 
 .schedule-cancel-btn:hover {
-  background-color: #777;
+  background-color: var(--color-gray-700);
 }
 
 .schedule-error-message {
-  color: #d32f2f;
-  background-color: #ffebee;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 16px;
-  font-size: 13px;
+  color: var(--color-text-danger);
+  background-color: var(--color-danger-bg);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--body-sm);
 }
 
 .schedule-main {
@@ -159,51 +153,51 @@
 }
 
 .schedule-main h2 {
-  margin: 0 0 20px 0;
-  color: #333;
-  font-size: 22px;
+  margin-bottom: var(--spacing-xl);
+  color: var(--color-text-primary);
+  font-size: var(--h2);
 }
 
 .schedule-no-events {
   text-align: center;
-  color: #999;
-  padding: 40px 20px;
-  font-size: 16px;
+  color: var(--color-gray-600);
+  padding: var(--spacing-4xl) var(--spacing-lg);
+  font-size: var(--body-lg);
 }
 
 .schedule-events-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 15px;
+  gap: var(--spacing-lg);
 }
 
 .schedule-event-card {
-  background: white;
-  padding: 20px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--color-gray-50);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--spacing-lg);
 }
 
 .schedule-event-info h3 {
   margin: 0;
-  color: #333;
-  font-size: 18px;
+  color: var(--color-text-primary);
+  font-size: var(--h3);
 }
 
 .event-header-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--spacing-sm);
 }
 
 .schedule-event-property {
-  margin: 0 0 0 4px;
-  color: #666;
-  font-size: 13px;
+  margin-right: var(--spacing-5);
+  color: var(--color-text-secondary);
+  font-size: var(--body-sm);
   line-height: 1.5;
   flex: 1;
   min-width: 160px;
@@ -213,31 +207,17 @@
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  margin: 6px 0;
-}
-
-.event-duration {
-  margin: 0;
-  color: #28a745;
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 1.5;
-  background-color: #d4edda;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid #28a745;
-  white-space: nowrap;
-  flex-shrink: 0;
+  margin: var(--spacing-6) 0;
 }
 
 .time-label {
-  font-weight: 600;
-  color: #333;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
   margin-right: 0.5em;
 }
 
 .schedule-event-property a {
-  color: #0066cc;
+  color: var(--color-link);
   text-decoration: none;
   word-break: break-all;
 }
@@ -247,161 +227,173 @@
 }
 
 .schedule-playlist-selected {
-  background-color: #f0f8ff;
-  border: 1px solid #0066cc;
-  border-radius: 4px;
-  padding: 10px;
-  margin-bottom: 10px;
+  background-color: var(--color-primary-light);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-10);
+  margin-bottom: var(--spacing-10);
 }
 
 .schedule-playlist-selected-title {
-  font-weight: 500;
-  color: #333;
-  font-size: 13px;
-  margin-bottom: 4px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-size: var(--body-sm);
+  margin-bottom: var(--spacing-xs);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .schedule-playlist-selected-url {
-  font-size: 11px;
-  color: #666;
+  font-size: var(--caption);
+  color: var(--color-text-secondary);
   font-family: monospace;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-sm);
 }
 
 .schedule-playlist-selected-actions {
   display: flex;
-  gap: 6px;
+  gap: var(--spacing-6);
 }
 
 .schedule-playlist-change-btn,
 .schedule-playlist-clear-btn {
   flex: 1;
-  padding: 6px 8px;
-  font-size: 12px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--body-md);
   border: none;
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
+  transition: var(--transition-fast);
 }
 
 .schedule-playlist-change-btn {
-  background-color: #2196F3;
-  color: white;
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
 }
 
 .schedule-playlist-change-btn:hover {
-  background-color: #1976D2;
+  background-color: var(--color-primary-hover);
 }
 
 .schedule-playlist-clear-btn {
-  background-color: #ddd;
-  color: #333;
+  background-color: var(--color-gray-400);
+  color: var(--color-text-primary);
 }
 
 .schedule-playlist-clear-btn:hover {
-  background-color: #ccc;
+  background-color: var(--color-gray-500);
 }
 
 .schedule-playlist-select-btn {
   width: 100%;
-  padding: 10px;
-  background-color: #2196F3;
-  color: white;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--body-md);
+  font-weight: var(--font-weight-medium);
 }
 
 .schedule-playlist-select-btn:hover {
-  background-color: #1976D2;
+  background-color: var(--color-primary-hover);
 }
 
 .schedule-event-actions {
   display: flex;
-  gap: 10px;
+  gap: var(--spacing-sm);
 }
 
 .schedule-edit-btn {
   flex: 1;
-  background-color: #2196F3;
+  background-color: var(--color-primary);
 }
 
 .schedule-edit-btn:hover:not(:disabled) {
-  background-color: #1976D2;
+  background-color: var(--color-primary-hover);
 }
 
 .schedule-edit-btn:disabled {
-  background-color: #ccc;
+  background-color: var(--color-disabled-bg);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
 .schedule-delete-btn {
   flex: 1;
-  background-color: #f44336;
-  color: white;
+  background-color: var(--color-danger);
+  color: var(--color-text-on-primary);
 }
 
 .schedule-delete-btn:hover {
-  background-color: #da190b;
-  color: white;
+  background-color: var(--color-danger-hover);
+  color: var(--color-text-on-primary);
 }
 
 .recording-status {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-size: var(--body-sm);
+  font-weight: var(--font-weight-semibold);
   letter-spacing: 0.5px;
 }
 
 .recording-status-scheduled {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffc107;
+  background-color: var(--color-bg-scheduled);
+  color: var(--color-text-scheduled);
+  border: 1px solid var(--color-border-scheduled);
 }
 
 .recording-status-started {
-  background-color: #cfe8fc;
-  color: #1565c0;
-  border: 1px solid #2196F3;
+  background-color: var(--color-bg-started);
+  color: var(--color-text-started);
+  border: 1px solid var(--color-border-started);
 }
 
 .recording-status-completed {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #28a745;
+  background-color: var(--color-bg-completed);
+  color: var(--color-text-completed);
+  border: 1px solid var(--color-border-completed);
 }
 
 .recording-status-failed {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background-color: var(--color-bg-failed);
+  color: var(--color-text-failed);
+  border: 1px solid var(--color-border-failed);
 }
 
 .recording-status-missed {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  border: 1px solid #dee2e6;
+  background-color: var(--color-bg-missed);
+  color: var(--color-text-missed);
+  border: 1px solid var(--color-border-missed);
 }
 
 .schedule-event-filename {
-  margin: 8px 0;
-  color: #555;
-  font-size: 12px;
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--body-sm);
   word-break: break-all;
-  padding: 8px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
-  border-left: 3px solid #2196F3;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-gray-100);
+  border-radius: var(--border-radius-md);
+  border-left: 3px solid var(--color-primary);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 1024px) {
