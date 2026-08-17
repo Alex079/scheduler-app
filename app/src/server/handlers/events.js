@@ -14,9 +14,18 @@ export function performGetAllEvents(req, res) {
  */
 export function performCreateNewEvent(req, res) {
   const { name, start_time, end_time, playlist_entry_id } = req.body;
+  const now = Math.floor(Date.now() / 1000);
 
   if (!name || !start_time || !end_time || !playlist_entry_id) {
     return res.status(400).json({ error: 'Name, start_time, end_time, and playlist_entry_id are required' });
+  }
+
+  if (start_time < now - 300) {
+    return res.status(400).json({ error: 'Start time must be in the future' });
+  }
+
+  if (start_time >= end_time) {
+    return res.status(400).json({ error: 'Start time must be before end time' });
   }
 
   return res.status(201).json(createNewEvent(name, start_time, end_time, playlist_entry_id, req.userId));
@@ -28,9 +37,18 @@ export function performCreateNewEvent(req, res) {
  */
 export function performUpdateEvent(req, res) {
   const { name, start_time, end_time, playlist_entry_id } = req.body;
+  const now = Math.floor(Date.now() / 1000);
 
   if (!name || !start_time || !end_time || !playlist_entry_id) {
     return res.status(400).json({ error: 'Name, start_time, end_time, and playlist_entry_id are required' });
+  }
+
+  if (start_time < now - 300) {
+    return res.status(400).json({ error: 'Start time must be in the future' });
+  }
+
+  if (start_time >= end_time) {
+    return res.status(400).json({ error: 'Start time must be before end time' });
   }
 
   const eventId = parseInt(req.params.id, 10);
