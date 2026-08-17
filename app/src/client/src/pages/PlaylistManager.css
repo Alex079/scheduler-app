@@ -261,8 +261,9 @@
 .playlist-delete-btn:hover {
   border-color: var(--color-danger);
   color: var(--color-danger);
-  background-color: var(--color-warning-bg);
+  background-color: var(--color-danger-bg);
 }
+
 
 .playlist-right h3 {
   margin: 0 0 var(--spacing-md) 0;
@@ -361,7 +362,7 @@
   color: var(--color-text-danger);
   padding: var(--spacing-md) var(--spacing-sm);
   border-radius: var(--border-radius-md);
-  margin-bottom: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
   font-size: var(--body-sm);
 }
 

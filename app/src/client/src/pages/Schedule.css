@@ -141,9 +141,9 @@
 .schedule-error-message {
   color: var(--color-text-danger);
   background-color: var(--color-danger-bg);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius-md);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
   font-size: var(--body-sm);
 }
 
