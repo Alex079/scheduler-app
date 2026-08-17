@@ -3,14 +3,14 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
 }
 
 .login-box {
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: var(--color-gray-50);
+  padding: var(--spacing-4xl);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-login-box);
   width: 100%;
   max-width: 400px;
   animation: slideIn 0.3s ease-out;
@@ -18,20 +18,20 @@
 
 .login-box h1 {
   text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-  font-size: 28px;
+  margin-bottom: var(--spacing-3xl);
+  color: var(--color-text-primary);
+  font-size: var(--h1);
 }
 
 .login-form-group {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-xl);
 }
 
 .login-form-group label {
   display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #555;
+  margin-bottom: var(--spacing-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-800);
 }
 
 .login-form-group input {
@@ -41,15 +41,15 @@
 .login-box button {
   width: 100%;
   padding: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--body-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .login-error-message {
-  color: #d32f2f;
-  background-color: #ffebee;
-  padding: 12px;
-  border-radius: 4px;
-  margin-bottom: 16px;
-  font-size: 14px;
+  color: var(--color-text-danger);
+  background-color: var(--color-danger-bg);
+  padding: var(--spacing-md) var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--body-md);
 }
