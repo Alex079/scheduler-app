@@ -121,12 +121,13 @@ export function createNewEvent(name, start_time, end_time, playlist_entry_id, cr
 export function updateEvent(id, name, start_time, end_time, playlist_entry_id) {
   const changes = db
     .prepare('UPDATE events SET name = ?, start_time = ?, end_time = ?, playlist_entry_id = ?, recording_status = NULL WHERE id = ?')
-    .run(name, start_time, end_time, playlist_entry_id, id);
+    .run(name, start_time, end_time, playlist_entry_id, id)
+    .changes;
   return (changes === 0) ? null : { id, name, start_time, end_time, playlist_entry_id };
 }
 
 export function deleteEvent(id) {
-  const changes = db.prepare('DELETE FROM events WHERE id = ?').run(id);
+  const changes = db.prepare('DELETE FROM events WHERE id = ?').run(id).changes;
   return (changes === 0) ? { message: 'Event not found' } : { message: 'Event deleted' };
 }
 
@@ -208,7 +209,7 @@ export function createNewPlaylist(url, name) {
 }
 
 export function deletePlaylist(playlistId) {
-  const changes = db.prepare('DELETE FROM playlists WHERE id = ?').run(playlistId);
+  const changes = db.prepare('DELETE FROM playlists WHERE id = ?').run(playlistId).changes;
   return (changes === 0) ? { message: 'Playlist not found' } : { message: 'Playlist deleted' };
 }
 
