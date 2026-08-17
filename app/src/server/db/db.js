@@ -188,7 +188,7 @@ export function eventMissed(id) {
 }
 
 export function getAllPlaylists() {
-  return db.prepare('SELECT id, name, url, last_refreshed FROM playlists').all() || [];
+  return db.prepare('SELECT id, name, url, COALESCE(last_refreshed, 0) AS last_refreshed FROM playlists').all() || [];
 }
 
 export function getAllOutdatedPlaylists() {
@@ -232,6 +232,9 @@ export function updatePlaylistEntries(playlistId, entriesToAdd, entriesToUpdate,
   entriesToAdd.forEach(entry => {
     insertStmt.run(entry.title, entry.logo, playlistId, entry.url);
   });
-  db.prepare(`UPDATE playlists SET last_refreshed = CAST(strftime('%s', 'now') AS INTEGER) WHERE id = ?`)
-    .run(playlistId);
+  updatePlaylistLastRefreshed(playlistId);
+}
+
+export function updatePlaylistLastRefreshed(playlistId) {
+  db.prepare('UPDATE playlists SET last_refreshed = CAST(strftime(\'%s\', \'now\') AS INTEGER) WHERE id = ?').run(playlistId);
 }

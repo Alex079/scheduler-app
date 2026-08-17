@@ -58,10 +58,6 @@ export async function refreshPlaylist(playlist) {
       console.error(`[PLAYLIST ${playlist.id}] ✗ Failed to refresh ${playlist.name}:`, error.message);
       return [];
     });
-  if (newEntries.length === 0) {
-    console.warn(`[PLAYLIST ${playlist.id}] ⚠️ No entries found after refresh ${playlist.name}`);
-    return;
-  }
   const existingEntries = getPlaylistEntries(playlist.id);
   const existingUrls = new Set(existingEntries.map(e => e.entry_url));
   const newUrls = new Set(newEntries.map(e => e.url));
