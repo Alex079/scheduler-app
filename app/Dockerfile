@@ -21,11 +21,11 @@ RUN npm ci
 FROM node:25-slim
 
 WORKDIR /app/client
-COPY --from=client /client/dist ./dist/
+COPY --from=client /client/dist/ ./dist/
 
 WORKDIR /app/server
+COPY --from=server /server/node_modules/ ./node_modules/
 COPY ./server/ ./
-COPY --from=server /server/ ./
 
 VOLUME [ "/database", "/pipe" ]
 
