@@ -4,27 +4,27 @@
 FROM node:25-slim AS client
 WORKDIR /client
 
-COPY src/client/package.json src/client/package-lock.json ./
+COPY ./client/package.json ./client/package-lock.json ./
 RUN npm ci
 
-COPY src/client/ ./
+COPY ./client/ ./
 RUN npm run build
 
 # ---------- Stage 2: server install ----------
 FROM node:25-slim AS server
 WORKDIR /server
 
-COPY src/server/package.json src/server/package-lock.json ./
+COPY ./server/package.json ./server/package-lock.json ./
 RUN npm ci
 
 # ---------- Stage 3: final runtime ----------
 FROM node:25-slim
 
-WORKDIR /app/run/client
+WORKDIR /app/client
 COPY --from=client /client/dist ./dist/
 
-WORKDIR /app/run/server
-COPY src/server/ ./
+WORKDIR /app/server
+COPY ./server/ ./
 COPY --from=server /server/ ./
 
 VOLUME [ "/database", "/pipe" ]
