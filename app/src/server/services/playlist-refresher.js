@@ -45,8 +45,22 @@ function parseExtinf(extinf) {
   return { logo, title };
 }
 
+function populateEntries(playlist) {
+  const existingEntries = getPlaylistEntries(playlist.id);
+  const existingUrls = new Set(existingEntries.map(e => e.entry_url));
+  return (newEntries) => {
+    const newUrls = new Set(newEntries.map(e => e.url));
+    const entriesToDelete = existingEntries.filter(e => !newUrls.has(e.entry_url)).map(e => e.id);
+    const entriesToAdd = newEntries.filter(e => !existingUrls.has(e.url));
+    const entriesToUpdate = newEntries.filter(e => existingUrls.has(e.url));
+    updatePlaylistEntries(playlist.id, entriesToAdd, entriesToUpdate, entriesToDelete);
+    const summary = `[+${entriesToAdd.length} ~${entriesToUpdate.length} -${entriesToDelete.length}]`;
+    console.log(`[PLAYLIST ${playlist.id}] ✓ Refreshed ${playlist.name}: ${summary} (total: ${newEntries.length})`);
+  }
+}
+
 export async function refreshPlaylist(playlist) {
-  const newEntries = await fetch(playlist.url)
+  return fetch(playlist.url)
     .then(response => {
       if (response.ok) {
         return response.text();
@@ -54,21 +68,10 @@ export async function refreshPlaylist(playlist) {
       throw new Error(`Failed to fetch playlist: ${response.statusText}`);
     })
     .then(parseM3U)
+    .then(populateEntries(playlist))
     .catch(error => {
       console.error(`[PLAYLIST ${playlist.id}] ✗ Failed to refresh ${playlist.name}:`, error.message);
-      return [];
     });
-  const existingEntries = getPlaylistEntries(playlist.id);
-  const existingUrls = new Set(existingEntries.map(e => e.entry_url));
-  const newUrls = new Set(newEntries.map(e => e.url));
-
-  const entriesToDelete = existingEntries.filter(e => !newUrls.has(e.entry_url)).map(e => e.id);
-  const entriesToAdd = newEntries.filter(e => !existingUrls.has(e.url));
-  const entriesToUpdate = newEntries.filter(e => existingUrls.has(e.url));
-
-  updatePlaylistEntries(playlist.id, entriesToAdd, entriesToUpdate, entriesToDelete);
-  const summary = `[+${entriesToAdd.length} ~${entriesToUpdate.length} -${entriesToDelete.length}]`;
-  console.log(`[PLAYLIST ${playlist.id}] ✓ Refreshed ${playlist.name}: ${summary} (total: ${newEntries.length})`);
 }
 
 export function startPlaylistScheduler() {

@@ -237,9 +237,5 @@ export function updatePlaylistEntries(playlistId, entriesToAdd, entriesToUpdate,
   entriesToAdd.forEach(entry => {
     insertStmt.run(entry.title, entry.logo, playlistId, entry.url);
   });
-  updatePlaylistLastRefreshed(playlistId);
-}
-
-export function updatePlaylistLastRefreshed(playlistId) {
   db.prepare('UPDATE playlists SET last_refreshed = CAST(strftime(\'%s\', \'now\') AS INTEGER) WHERE id = ?').run(playlistId);
 }
