@@ -61,6 +61,18 @@ function buildCommand(event) {
 
   const filename = `${startFormatted}_${endFormatted}_${streamName}_${eventName}.mp4`;
 
+  // The command is written to a FIFO and consumed by a shell loop that
+  // performs unquoted word-splitting/globbing, so reject any values that
+  // contain shell metacharacters or whitespace that would break parsing
+  // or allow argument-injection into the ffmpeg invocation.
+  const SAFE_PATTERN = /^[A-Za-z0-9._:@/+=?-]+$/;
+  if (!SAFE_PATTERN.test(streamUrl)) {
+    throw new Error('Stream URL contains disallowed characters');
+  }
+  if (!SAFE_PATTERN.test(filename)) {
+    throw new Error('Output filename contains disallowed characters');
+  }
+
   const command = `ID=${event.id} STREAM=${streamUrl} DURATION=${duration} OUTPUT=${filename}`;
 
   return { command, filename };
