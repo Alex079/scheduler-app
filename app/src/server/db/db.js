@@ -66,6 +66,10 @@ export function initializeDatabase() {
     )
   `);
 
+  // Index for join lookups and diff-based refresh comparisons
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_playlist_entries_url ON playlist_entries (entry_url)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_playlist_entries_playlist ON playlist_entries (playlist_id)`);
+
   // Seed admin users if they don't exist
   const users = process.env.USERS?.split(',').map(cred => {
     const [username, password] = cred.split(':');

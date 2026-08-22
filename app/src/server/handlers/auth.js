@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { login } from '../db/db.js';
 
-const SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const SECRET = process.env.JWT_SECRET;
 
 export function verifyToken(req, res, next) {
   const token = req.headers['authorization']?.split(' ')[1];
