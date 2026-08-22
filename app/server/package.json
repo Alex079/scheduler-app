@@ -5,7 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "lint": "eslint ."
   },
   "keywords": [
     "scheduler",
@@ -25,7 +26,10 @@
     "better-sqlite3": "^12"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^3"
+    "@eslint/js": "^9",
+    "@types/bcryptjs": "^3",
+    "eslint": "^9",
+    "globals": "^15"
   },
   "allowScripts": {
     "better-sqlite3@12.11.1": true
