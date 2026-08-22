@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { login } from '../db/db.js';
+import { randomUUID } from 'crypto';
 
-const SECRET = process.env.JWT_SECRET;
+const SECRET = process.env.JWT_SECRET ?? randomUUID();
 
 export function verifyToken(req, res, next) {
   const token = req.headers['authorization']?.split(' ')[1];
