@@ -3,7 +3,7 @@ import { existsSync, mkdirSync } from 'fs';
 import bcrypt from 'bcryptjs';
 import Database from 'better-sqlite3';
 
-const DATABASE_DIR = '../../../database/';
+const DATABASE_DIR = '../../database/';
 
 // Ensure db directory exists
 if (!existsSync(DATABASE_DIR)) {

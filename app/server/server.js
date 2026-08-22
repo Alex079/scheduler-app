@@ -14,7 +14,7 @@ startEventScheduler();
 startPlaylistScheduler();
 
 const PORT = process.env.APP_PORT || 3000;
-const staticPath = '../../src/client/dist';
+const staticPath = '../client/dist';
 
 express()
   .use(cors())
