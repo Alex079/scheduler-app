@@ -11,6 +11,7 @@ services:
     volumes:
       - ./database:/database
       - pipe:/pipe
+    init: true
   ffmpeg-app:
     container_name: ffmpeg-app
     image: ffmpeg-app
