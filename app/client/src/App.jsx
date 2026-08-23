@@ -1,21 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Login from './pages/Login'
 import Schedule from './pages/Schedule'
 import './App.css'
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [username, setUsername] = useState('')
-
-  useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('token')
-    const user = localStorage.getItem('username')
-    if (token && user) {
-      setUsername(user)
-      setIsLoggedIn(true)
-    }
-  }, [])
+  const [username, setUsername] = useState(() => localStorage.getItem('username'))
+  const [isLoggedIn, setIsLoggedIn] = useState(() => username && localStorage.getItem('token'))
 
   const handleLoginSuccess = (user) => {
     setUsername(user)
