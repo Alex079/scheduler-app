@@ -8,46 +8,47 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
   const [entries, setEntries] = useState([])
   const [selectedPlaylist, setSelectedPlaylist] = useState(null)
   const [selectedEntry, setSelectedEntry] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [newPlaylistUrl, setNewPlaylistUrl] = useState('')
   const [newPlaylistName, setNewPlaylistName] = useState('')
   const [addingPlaylist, setAddingPlaylist] = useState(false)
 
-  useEffect(() => {
-    loadPlaylists()
-  }, [])
-
-  const loadPlaylists = async () => {
-    try {
-      setLoading(true)
-      const response = await playlistAPI.getPlaylists()
-      setPlaylists(response.data)
-      setError('')
-    } catch (err) {
-      setError('Failed to load playlists')
-      console.error(err)
-      if (err.status === 401) onLogout()
-    } finally {
-      setLoading(false)
-    }
+  const handlePlaylistsResponse = (response) => {
+    setError('')
+    setPlaylists(response.data)
   }
 
-  const loadEntries = async (playlistId) => {
-    try {
-      setLoading(true)
-      const response = await playlistAPI.getEntries(playlistId)
-      setEntries(response.data)
-      setSelectedPlaylist(playlistId)
-      setSelectedEntry(null)
-      setError('')
-    } catch (err) {
-      setError('Failed to load entries')
-      console.error(err)
-      if (err.status === 401) onLogout()
-    } finally {
-      setLoading(false)
-    }
+  const handlePlaylistsError = (err) => {
+    setError(`Failed to load playlists ${err}`)
+    if (err.status === 401) onLogout()
+  }
+
+  const handleEntriesResponse = (playlistId) => (response) => {
+    setError('')
+    setEntries(response.data)
+    setSelectedPlaylist(playlistId)
+    setSelectedEntry(null)
+  }
+
+  const handleEntriesError = (err) => {
+    setError(`Failed to load playlist entries ${err}`)
+    if (err.status === 401) onLogout()
+  }
+
+  const loadPlaylists = async () => playlistAPI.getPlaylists()
+    .then(handlePlaylistsResponse, handlePlaylistsError)
+    .finally(() => setLoading(false))
+
+  const reloadPlaylists = () => setLoading(true, loadPlaylists)
+
+  useEffect(() => {loadPlaylists()}, [])
+
+  const reloadEntries = async (playlistId) => {
+    setLoading(true)
+    playlistAPI.getEntries(playlistId)
+      .then(handleEntriesResponse(playlistId), handleEntriesError)
+      .finally(() => setLoading(false))
   }
 
   const handleAddPlaylist = async (e) => {
@@ -62,7 +63,7 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
       await playlistAPI.addPlaylist(newPlaylistUrl, newPlaylistName)
       setNewPlaylistUrl('')
       setNewPlaylistName('')
-      await loadPlaylists()
+      reloadPlaylists()
       setError('')
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to add playlist')
@@ -82,7 +83,7 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
         setSelectedPlaylist(null)
         setEntries([])
       }
-      await loadPlaylists()
+      reloadPlaylists()
     } catch (err) {
       setError('Failed to delete playlist')
       console.error(err)
@@ -94,9 +95,9 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
     try {
       await playlistAPI.refreshPlaylist(id)
       if (selectedPlaylist === id) {
-        await loadEntries(id)
+        await reloadEntries(id)
       }
-      await loadPlaylists()
+      reloadPlaylists()
     } catch (err) {
       setError('Failed to refresh playlist')
       console.error(err)
@@ -166,7 +167,7 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
                       key={p.id}
                       className={`playlist-item ${selectedPlaylist === p.id ? 'active' : ''}`}
                     >
-                      <div onClick={() => loadEntries(p.id)} className="playlist-info">
+                      <div onClick={() => reloadEntries(p.id)} className="playlist-info">
                         <div className="playlist-name">{p.name}</div>
                         <div className="playlist-url" title={p.url}>{p.url}</div>
                         <div className="playlist-meta">

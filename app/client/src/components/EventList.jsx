@@ -1,5 +1,7 @@
 import { unixSecondsToLocalTime } from "../utils/dates";
 
+const getUnixSecondsNow = () => Date.now() / 1000;
+
 export default function EventList({ events, isLoading, onEdit, onDelete }) {
   if (isLoading) return <p>⏳</p>
 
@@ -15,7 +17,7 @@ export default function EventList({ events, isLoading, onEdit, onDelete }) {
 }
 
 function EventCard({ event, onEdit, onDelete }) {
-  const now = Date.now() / 1000;
+  const now = getUnixSecondsNow();
   const futureEvent = now < event.start_time;
   const pastEvent = event.end_time < now;
   const currentEvent = !futureEvent && !pastEvent;
