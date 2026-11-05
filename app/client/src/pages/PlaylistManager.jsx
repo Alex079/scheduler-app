@@ -21,7 +21,7 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
 
   const handlePlaylistsError = (err) => {
     setError(`Failed to load playlists ${err}`)
-    if (err.status === 401) onLogout()
+    if (err.response?.status === 401) onLogout?.()
   }
 
   const handleEntriesResponse = (playlistId) => (response) => {
@@ -33,14 +33,17 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
 
   const handleEntriesError = (err) => {
     setError(`Failed to load playlist entries ${err}`)
-    if (err.status === 401) onLogout()
+    if (err.response?.status === 401) onLogout?.()
   }
 
   const loadPlaylists = async () => playlistAPI.getPlaylists()
     .then(handlePlaylistsResponse, handlePlaylistsError)
     .finally(() => setLoading(false))
 
-  const reloadPlaylists = () => setLoading(true, loadPlaylists)
+  const reloadPlaylists = () => {
+    setLoading(true)
+    return loadPlaylists()
+  }
 
   useEffect(() => {loadPlaylists()}, [])
 
@@ -68,14 +71,14 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to add playlist')
       console.error(err)
-      if (err.status === 401) onLogout()
+      if (err.response?.status === 401) onLogout?.()
     } finally {
       setAddingPlaylist(false)
     }
   }
 
   const handleDeletePlaylist = async (id) => {
-    if (!window.confirm('Delete this playlist and all its entries?')) return
+    if (!window.confirm('Delete this playlist and its unused entries?')) return
 
     try {
       await playlistAPI.deletePlaylist(id)
@@ -87,7 +90,7 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
     } catch (err) {
       setError('Failed to delete playlist')
       console.error(err)
-      if (err.status === 401) onLogout()
+      if (err.response?.status === 401) onLogout?.()
     }
   }
 
@@ -101,7 +104,7 @@ export default function PlaylistManager({ onEntrySelected, onClose, onLogout }) 
     } catch (err) {
       setError('Failed to refresh playlist')
       console.error(err)
-      if (err.status === 401) onLogout()
+      if (err.response?.status === 401) onLogout?.()
     }
   }
 

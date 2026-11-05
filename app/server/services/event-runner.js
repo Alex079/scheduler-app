@@ -1,25 +1,77 @@
-import { eventScheduled, eventStarted, eventCompleted, eventFailed, getUpcomingEvents, eventMissed, getAllScheduledEvents } from '../db/db.js';
+import { eventScheduled, eventStarted, eventCompleted, eventFailed, getUpcomingEvents, eventMissed, getAllScheduledEvents, markMissedPastEvents } from '../db/db.js';
 import { createReadStream, createWriteStream } from 'fs';
 
-const requestStream = createWriteStream('/pipe/request');
-const responseStream = createReadStream('/pipe/response');
+const RECONNECT_DELAY_MS = 1000;
 
-responseStream.on('data', (data) => {
-  const lines = data.toString().split('\n').filter(line => line.trim() !== '');
-  lines.forEach(line => {
-    const [idPart, status] = line.split('=');
-    const eventId = parseInt(idPart, 10);
-    if (status === 'OK') {
-      console.log(`[EVENT ${eventId}] Recording completed successfully`);
-      eventCompleted(eventId);
-    } else if (status === 'FAILED') {
-      console.log(`[EVENT ${eventId}] Recording failed`);
-      eventFailed(eventId);
-    } else {
-      console.log(`Unknown response: ${line}`);
-    }
+/**
+ * Open the FIFO write end used to send recording commands to the ffmpeg service.
+ * The stream is recreated after an error (e.g. the reader restarts) so commands
+ * are not lost permanently when the ffmpeg container is recycled.
+ */
+let requestStream = null;
+function getRequestStream() {
+  if (!requestStream) {
+    requestStream = createWriteStream('/pipe/request');
+    requestStream.on('error', (err) => {
+      console.error(`Request pipe error: ${err.message}`);
+      requestStream = null;
+    });
+  }
+  return requestStream;
+}
+
+function writeRequest(command) {
+  getRequestStream().write(command + '\n');
+}
+
+/**
+ * Handle one `ID=STATUS` line from the ffmpeg service.
+ */
+function handleResponseLine(line) {
+  const [idPart, status] = line.split('=');
+  const eventId = parseInt(idPart, 10);
+  if (status === 'OK') {
+    console.log(`[EVENT ${eventId}] Recording completed successfully`);
+    eventCompleted(eventId);
+  } else if (status === 'FAILED') {
+    console.log(`[EVENT ${eventId}] Recording failed`);
+    eventFailed(eventId);
+  } else {
+    console.log(`Unknown response: ${line}`);
+  }
+}
+
+/**
+ * Read the FIFO response end. Data is buffered so status lines split across
+ * chunk boundaries are parsed correctly, and the stream is reopened when it
+ * ends or errors (e.g. the ffmpeg service restarts).
+ */
+let responseStream = null;
+function openResponseStream() {
+  responseStream = createReadStream('/pipe/response');
+  let buffer = '';
+
+  responseStream.on('data', (data) => {
+    buffer += data.toString();
+    const lines = buffer.split('\n');
+    buffer = lines.pop(); // keep the trailing partial line
+    lines.forEach(line => {
+      if (line.trim() !== '') handleResponseLine(line);
+    });
   });
-});
+
+  responseStream.on('error', (err) => {
+    console.error(`Response pipe error: ${err.message}`);
+    setTimeout(openResponseStream, RECONNECT_DELAY_MS);
+  });
+
+  responseStream.on('end', () => {
+    console.log('Response pipe closed; reopening...');
+    setTimeout(openResponseStream, RECONNECT_DELAY_MS);
+  });
+}
+
+openResponseStream();
 
 // Map to track scheduled events: eventId => timeoutId
 const scheduledEvents = new Map();
@@ -96,11 +148,16 @@ function scheduleEventRecording(event) {
   eventScheduled(event.id);
 
   function performEventRecording() {
-    const { command, filename } = buildCommand(event);
-    eventStarted(event.id, filename);
-    console.log(`[EVENT ${event.id}] Starting recording`);
-    requestStream.write(command + '\n');
     scheduledEvents.delete(event.id);
+    try {
+      const { command, filename } = buildCommand(event);
+      eventStarted(event.id, filename);
+      console.log(`[EVENT ${event.id}] Starting recording`);
+      writeRequest(command);
+    } catch (err) {
+      console.error(`[EVENT ${event.id}] ✗ Failed to start recording: ${err.message}`);
+      eventFailed(event.id);
+    }
   }
 
   scheduledEvents.set(event.id, setTimeout(performEventRecording, delay));
@@ -112,7 +169,19 @@ function scheduleEventRecording(event) {
 export function startEventScheduler() {
   console.log('Starting event scheduler...');
   getAllScheduledEvents().forEach(scheduleEventRecording); // reschedule on startup
-  setInterval(() => getUpcomingEvents().forEach(scheduleEventRecording), 60 * 1000); // Every minute
+
+  function tick() {
+    getUpcomingEvents().forEach(scheduleEventRecording);
+    // Events whose start time passed while the server was down (or before they
+    // could be scheduled) would otherwise stay unrecorded forever.
+    const missed = markMissedPastEvents();
+    if (missed > 0) {
+      console.log(`Marked ${missed} past event(s) as missed`);
+    }
+  }
+
+  tick();
+  setInterval(tick, 60 * 1000); // Every minute
 }
 
 /**

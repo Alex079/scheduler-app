@@ -192,15 +192,30 @@ export function eventMissed(id) {
   db.prepare('UPDATE events SET recording_status = ? WHERE id = ?').run('missed', id);
 }
 
+/**
+ * Mark events that were never scheduled (e.g. the server was down at their start
+ * time) as missed, so they don't stay in an indeterminate state forever.
+ * @returns {number} Number of events marked as missed
+ */
+export function markMissedPastEvents() {
+  return db
+    .prepare(`UPDATE events SET recording_status = 'missed' WHERE recording_status IS NULL AND start_time <= ?`)
+    .run(Math.floor(Date.now() / 1000)).changes;
+}
+
 export function getAllPlaylists() {
   return db.prepare('SELECT id, name, url, COALESCE(last_refreshed, 0) AS last_refreshed FROM playlists').all() || [];
+}
+
+export function getPlaylistById(id) {
+  return db.prepare('SELECT id, name, url FROM playlists WHERE id = ?').get(id);
 }
 
 export function getAllOutdatedPlaylists() {
   return db
     .prepare(`
       SELECT id, name, url FROM playlists
-      WHERE last_refreshed < (CAST(strftime('%s', 'now') AS INTEGER) - 86400)`)
+      WHERE COALESCE(last_refreshed, 0) < (CAST(strftime('%s', 'now') AS INTEGER) - 86400)`)
     .all() || [];
 }
 
@@ -213,7 +228,17 @@ export function createNewPlaylist(url, name) {
 }
 
 export function deletePlaylist(playlistId) {
-  const changes = db.prepare('DELETE FROM playlists WHERE id = ?').run(playlistId).changes;
+  const removePlaylist = db.transaction(() => {
+    // Remove entries that are no longer in use. Entries referenced by an event are
+    // kept (their playlist_id is nulled by the ON DELETE SET NULL foreign key) so
+    // existing events remain valid.
+    db.prepare(`
+      DELETE FROM playlist_entries
+      WHERE playlist_id = ? AND id NOT IN (SELECT playlist_entry_id FROM events)`)
+      .run(playlistId);
+    return db.prepare('DELETE FROM playlists WHERE id = ?').run(playlistId).changes;
+  });
+  const changes = removePlaylist();
   return (changes === 0) ? { message: 'Playlist not found' } : { message: 'Playlist deleted' };
 }
 
@@ -223,19 +248,32 @@ export function getPlaylistEntries(playlistId) {
     .all(playlistId) || [];
 }
 
+export function getPlaylistEntryById(id) {
+  return db.prepare('SELECT id FROM playlist_entries WHERE id = ?').get(id);
+}
+
 export function updatePlaylistEntries(playlistId, entriesToAdd, entriesToUpdate, entriesToDelete) {
-  if (entriesToDelete.length > 0) {
-    const placeholders = entriesToDelete.map(() => '?').join(',');
-    db.prepare(`DELETE FROM playlist_entries WHERE playlist_id = ? AND id IN (${placeholders})`)
-      .run(playlistId, ...entriesToDelete);
-  }
-  const updateStmt = db.prepare('UPDATE playlist_entries SET title = ?, logo = ? WHERE playlist_id = ? AND entry_url = ?');
-  entriesToUpdate.forEach(entry => {
-    updateStmt.run(entry.title, entry.logo, playlistId, entry.url);
+  const applyChanges = db.transaction(() => {
+    if (entriesToDelete.length > 0) {
+      const placeholders = entriesToDelete.map(() => '?').join(',');
+      // Never delete entries still referenced by an event: events.playlist_entry_id
+      // is NOT NULL with a RESTRICT foreign key, so the delete would fail and abort
+      // the whole refresh. Keeping them lets scheduled/historical events stay valid.
+      db.prepare(`
+        DELETE FROM playlist_entries
+        WHERE playlist_id = ? AND id IN (${placeholders})
+          AND id NOT IN (SELECT playlist_entry_id FROM events)`)
+        .run(playlistId, ...entriesToDelete);
+    }
+    const updateStmt = db.prepare('UPDATE playlist_entries SET title = ?, logo = ? WHERE playlist_id = ? AND entry_url = ?');
+    entriesToUpdate.forEach(entry => {
+      updateStmt.run(entry.title, entry.logo, playlistId, entry.url);
+    });
+    const insertStmt = db.prepare('INSERT INTO playlist_entries (title, logo, playlist_id, entry_url) VALUES (?, ?, ?, ?)');
+    entriesToAdd.forEach(entry => {
+      insertStmt.run(entry.title, entry.logo, playlistId, entry.url);
+    });
+    db.prepare('UPDATE playlists SET last_refreshed = CAST(strftime(\'%s\', \'now\') AS INTEGER) WHERE id = ?').run(playlistId);
   });
-  const insertStmt = db.prepare('INSERT INTO playlist_entries (title, logo, playlist_id, entry_url) VALUES (?, ?, ?, ?)');
-  entriesToAdd.forEach(entry => {
-    insertStmt.run(entry.title, entry.logo, playlistId, entry.url);
-  });
-  db.prepare('UPDATE playlists SET last_refreshed = CAST(strftime(\'%s\', \'now\') AS INTEGER) WHERE id = ?').run(playlistId);
+  applyChanges();
 }

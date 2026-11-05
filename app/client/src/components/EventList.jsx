@@ -1,8 +1,22 @@
+import { useEffect, useState } from "react";
 import { unixSecondsToLocalTime } from "../utils/dates";
 
-const getUnixSecondsNow = () => Date.now() / 1000;
+const TICK_MS = 30 * 1000;
+
+// Re-renders on an interval so future/ongoing/past states stay accurate while
+// the page is left open (otherwise they only update on reload).
+function useNow(intervalMs = TICK_MS) {
+  const [now, setNow] = useState(() => Date.now() / 1000);
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now() / 1000), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
 
 export default function EventList({ events, isLoading, onEdit, onDelete }) {
+  const now = useNow();
+
   if (isLoading) return <p>⏳</p>
 
   if (events.length === 0) return <p className="schedule-no-events">No events scheduled yet</p>
@@ -10,14 +24,13 @@ export default function EventList({ events, isLoading, onEdit, onDelete }) {
   return (
     <div className="schedule-events-list">
       {events.map(event => (
-        <EventCard key={event.id} event={event} onEdit={() => onEdit(event)} onDelete={() => onDelete(event.id)} />
+        <EventCard key={event.id} event={event} now={now} onEdit={() => onEdit(event)} onDelete={() => onDelete(event.id)} />
       ))}
     </div>
   )
 }
 
-function EventCard({ event, onEdit, onDelete }) {
-  const now = getUnixSecondsNow();
+function EventCard({ event, now, onEdit, onDelete }) {
   const futureEvent = now < event.start_time;
   const pastEvent = event.end_time < now;
   const currentEvent = !futureEvent && !pastEvent;

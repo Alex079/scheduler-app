@@ -23,7 +23,7 @@ export default function Schedule({ username, onLogout }) {
 
   const handleError = (err) => {
     setError(`Failed to load events ${err}`)
-    if (err.status === 401) onLogout()
+    if (err.response?.status === 401) onLogout()
   }
 
   const loadEvents = () => eventsAPI.getAll()

@@ -60,24 +60,23 @@ function populateEntries(playlist) {
 }
 
 export async function refreshPlaylist(playlist) {
-  return fetch(playlist.url)
-    .then(response => {
-      if (response.ok) {
-        return response.text();
-      }
-      throw new Error(`Failed to fetch playlist: ${response.statusText}`);
-    })
-    .then(parseM3U)
-    .then(populateEntries(playlist))
-    .catch(error => {
-      console.error(`[PLAYLIST ${playlist.id}] ✗ Failed to refresh ${playlist.name}:`, error.message);
-    });
+  const response = await fetch(playlist.url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch playlist: ${response.statusText}`);
+  }
+  const entries = parseM3U(await response.text());
+  populateEntries(playlist)(entries);
+  return entries.length;
 }
 
 export function startPlaylistScheduler() {
   console.log('Starting playlist scheduler...');
   function refreshAllPlaylists() {
-    getAllOutdatedPlaylists().forEach(refreshPlaylist);
+    getAllOutdatedPlaylists().forEach(playlist => {
+      refreshPlaylist(playlist).catch(error => {
+        console.error(`[PLAYLIST ${playlist.id}] ✗ Failed to refresh ${playlist.name}:`, error.message);
+      });
+    });
   }
   refreshAllPlaylists();
   setInterval(refreshAllPlaylists, 12 * 60 * 60 * 1000); // Every 12 hours

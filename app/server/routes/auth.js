@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { performLogin } from '../handlers/auth.js';
+import { performLogin, loginRateLimit } from '../handlers/auth.js';
 
 const router = Router();
 
-router.post('/login', performLogin);
+router.post('/login', loginRateLimit, performLogin);
 
 export default router;
