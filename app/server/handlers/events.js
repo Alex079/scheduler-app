@@ -101,7 +101,7 @@ export function performDeleteEvent(req, res) {
   }
 
   const deleted = deleteEventById(eventId);
-  if (deleted === 0) {
+  if (deleted) {
     return res.status(404).json({ error: 'Event not found' });
   }
   return res.status(200).json({ message: 'Event deleted' });

@@ -1,6 +1,7 @@
 import express, { json, static as expressStatic } from 'express';
 import cors from 'cors';
-import path from 'path';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import eventRoutes from './routes/events.js';
 import playlistRoutes from './routes/playlists.js';
@@ -15,7 +16,7 @@ startEventScheduler();
 startPlaylistScheduler();
 
 const PORT = process.env.APP_PORT || 3000;
-const staticPath = path.resolve(__dirname, '../client/dist');
+const staticPath = resolve(fileURLToPath(import.meta.url), '../client/dist');
 
 function shutdown() {
   console.log('\nShutdown requested: stopping schedulers and closing resources...');

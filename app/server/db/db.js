@@ -1,9 +1,13 @@
-import path, { join } from 'path';
+import { join, resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { existsSync, mkdirSync } from 'fs';
 import bcrypt from 'bcryptjs';
 import Database from 'better-sqlite3';
 
-const DATABASE_DIR = path.resolve(__dirname, '../../database');
+// __dirname is unavailable under "type": "module"; derive the module's absolute
+// path from the import meta URL so paths resolve against this file, not cwd.
+const moduleUrl = import.meta.url;
+const DATABASE_DIR = resolve(fileURLToPath(moduleUrl), '../../database');
 
 // Ensure db directory exists
 if (!existsSync(DATABASE_DIR)) {
@@ -135,7 +139,7 @@ export function updateEvent(id, name, start_time, end_time, playlist_entry_id) {
  * matched / the event did not exist); callers treat 0 as "not found".
  */
 export function deleteEventById(id) {
-  return db.prepare('DELETE FROM events WHERE id = ?').run(id).changes;
+  return db.prepare('DELETE FROM events WHERE id = ?').run(id).changes === 0;
 }
 
 export function getUpcomingEvents() {
