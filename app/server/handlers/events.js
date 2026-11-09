@@ -1,4 +1,12 @@
-import { getAllEvents, createNewEvent, updateEvent, deleteEvent, getPlaylistEntryById } from '../db/db.js';
+import {
+  getAllEvents,
+  createNewEvent,
+  updateEvent,
+  deleteEvent,
+  deleteEventById,
+  getPlaylistEntryById,
+  getEventById,
+} from '../db/db.js';
 import { cancelScheduledEvent } from '../services/event-runner.js';
 
 /**
@@ -23,8 +31,11 @@ function validateEventInput({ name, start_time, end_time, playlist_entry_id }) {
   }
 
   const now = Math.floor(Date.now() / 1000);
-  if (start_time < now - 300) {
-    return 'Start time must be in the future';
+  if (start_time < now) {
+    return 'Start time must be the future or now';
+  }
+  if (end_time < now) {
+    return 'End time must be the future or now';
   }
   if (start_time >= end_time) {
     return 'Start time must be before end time';
@@ -61,6 +72,13 @@ export function performUpdateEvent(req, res) {
 
   const eventId = parseInt(req.params.id, 10);
 
+  // Refuse to modify an event that is actively recording so a caller cannot
+  // delete/rename an in-progress recording.
+  const existing = getEventById(eventId);
+  if (existing?.recording_status === 'started') {
+    return res.status(409).json({ error: 'Cannot update an event that is currently recording' });
+  }
+
   cancelScheduledEvent(eventId);
 
   const updatedEvent = updateEvent(eventId, name, start_time, end_time, playlist_entry_id);
@@ -76,7 +94,16 @@ export function performUpdateEvent(req, res) {
 export function performDeleteEvent(req, res) {
   const eventId = parseInt(req.params.id, 10);
 
-  cancelScheduledEvent(eventId);
+  // Refuse to delete an event that is actively recording so a caller cannot
+  // drop an in-progress recording.
+  const existing = getEventById(eventId);
+  if (existing?.recording_status === 'started') {
+    return res.status(409).json({ error: 'Cannot delete an event that is currently recording' });
+  }
 
-  return res.status(200).json(deleteEvent(eventId));
+  const deleted = deleteEventById(eventId);
+  if (deleted === 0) {
+    return res.status(404).json({ error: 'Event not found' });
+  }
+  return res.status(200).json({ message: 'Event deleted' });
 }

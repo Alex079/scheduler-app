@@ -30,6 +30,10 @@ function writeRequest(command) {
 function handleResponseLine(line) {
   const [idPart, status] = line.split('=');
   const eventId = parseInt(idPart, 10);
+  if (!Number.isInteger(eventId)) {
+    console.warn(`[EVENT] Ignoring malformed response line: ${line}`);
+    return;
+  }
   if (status === 'OK') {
     console.log(`[EVENT ${eventId}] Recording completed successfully`);
     eventCompleted(eventId);
@@ -153,6 +157,15 @@ function scheduleEventRecording(event) {
       const { command, filename } = buildCommand(event);
       eventStarted(event.id, filename);
       console.log(`[EVENT ${event.id}] Starting recording`);
+      // Guard the request pipe: if there is no reader (e.g. the ffmpeg
+      // container is down) the write stream errors. Rather than dropping the
+      // command, mark the event back to 'scheduled' so the next minute tick
+      // re-attempts it. Past events are still caught by markMissedPastEvents.
+      if (!requestStream) {
+        console.error(`[EVENT ${event.id}] ✗ Request pipe unavailable; will retry on next tick`);
+        eventScheduled(event.id);
+        return;
+      }
       writeRequest(command);
     } catch (err) {
       console.error(`[EVENT ${event.id}] ✗ Failed to start recording: ${err.message}`);
@@ -182,6 +195,20 @@ export function startEventScheduler() {
 
   tick();
   setInterval(tick, 60 * 1000); // Every minute
+}
+
+/**
+ * Stop the event scheduler: clear every pending recording timeout and stop
+ * re-opening the response FIFO, so the process can exit cleanly.
+ */
+export function stopEventScheduler() {
+  if (responseStream) {
+    responseStream.destroy();
+    responseStream = null;
+  }
+  scheduledEvents.forEach((timeoutId) => clearTimeout(timeoutId));
+  scheduledEvents.clear();
+  console.log('Event scheduler stopped');
 }
 
 /**
