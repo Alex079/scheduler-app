@@ -1,7 +1,9 @@
 import express, { json, static as expressStatic } from 'express';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import authRoutes from './routes/auth.js';
+import eventRoutes from './routes/events.js';
+import playlistRoutes from './routes/playlists.js';
 import { initializeDatabase, closeDatabase } from './db/db.js';
 import { startEventScheduler, stopEventScheduler } from './services/event-runner.js';
 import { startPlaylistScheduler, stopPlaylistScheduler } from './services/playlist-refresher.js';
