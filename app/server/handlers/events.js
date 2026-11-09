@@ -2,7 +2,6 @@ import {
   getAllEvents,
   createNewEvent,
   updateEvent,
-  deleteEvent,
   deleteEventById,
   getPlaylistEntryById,
   getEventById,
