@@ -130,13 +130,12 @@ export function updateEvent(id, name, start_time, end_time, playlist_entry_id) {
   return (changes === 0) ? null : { id, name, start_time, end_time, playlist_entry_id };
 }
 
+/**
+ * Delete an event by id. Returns the number of affected rows (0 if nothing
+ * matched / the event did not exist); callers treat 0 as "not found".
+ */
 export function deleteEventById(id) {
   return db.prepare('DELETE FROM events WHERE id = ?').run(id).changes;
-}
-
-export function deleteEvent(id) {
-  const changes = db.prepare('DELETE FROM events WHERE id = ?').run(id).changes;
-  return (changes === 0) ? { message: 'Event not found' } : { message: 'Event deleted' };
 }
 
 export function getUpcomingEvents() {
