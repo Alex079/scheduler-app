@@ -2,15 +2,15 @@
 
 # Prepare the named pipes for communication with the scheduler-app
 mkdir -p /pipe
-mkfifo /pipe/request
-mkfifo /pipe/response
+[ -p /pipe/request ]  || mkfifo /pipe/request
+[ -p /pipe/response ] || mkfifo /pipe/response
 
 cleanup () {
-  echo 'Stopping...'
-  killall -q -SIGINT ffmpeg
+  echo 'Stopping ffmpeg-app...'
+  killall -q -INT ffmpeg 2>/dev/null || true
 }
 
-trap cleanup SIGINT SIGTERM
+trap cleanup INT TERM
 
 echo "Starting..."
 
