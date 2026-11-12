@@ -1,9 +1,10 @@
-import { join } from 'path';
+import { join, resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { existsSync, mkdirSync } from 'fs';
 import bcrypt from 'bcryptjs';
 import Database from 'better-sqlite3';
 
-const DATABASE_DIR = '../../database/';
+const DATABASE_DIR = resolve(import.meta.dirname, '../../database');
 
 // Ensure db directory exists
 if (!existsSync(DATABASE_DIR)) {
@@ -130,9 +131,12 @@ export function updateEvent(id, name, start_time, end_time, playlist_entry_id) {
   return (changes === 0) ? null : { id, name, start_time, end_time, playlist_entry_id };
 }
 
-export function deleteEvent(id) {
-  const changes = db.prepare('DELETE FROM events WHERE id = ?').run(id).changes;
-  return (changes === 0) ? { message: 'Event not found' } : { message: 'Event deleted' };
+/**
+ * Delete an event by id. Returns the number of affected rows (0 if nothing
+ * matched / the event did not exist); callers treat 0 as "not found".
+ */
+export function deleteEventById(id) {
+  return db.prepare('DELETE FROM events WHERE id = ?').run(id).changes === 0;
 }
 
 export function getUpcomingEvents() {
@@ -250,6 +254,27 @@ export function getPlaylistEntries(playlistId) {
 
 export function getPlaylistEntryById(id) {
   return db.prepare('SELECT id FROM playlist_entries WHERE id = ?').get(id);
+}
+
+/**
+ * Fetch a single event by id, including its current recording status.
+ * Used by the update/delete handlers to refuse mutating an event that is
+ * currently being recorded.
+ */
+export function getEventById(id) {
+  return db.prepare('SELECT * FROM events WHERE id = ?').get(id);
+}
+
+/**
+ * Close the SQLite connection so the WAL can flush and the process can
+ * exit cleanly (see graceful shutdown in server.js).
+ */
+export function closeDatabase() {
+  try {
+    db.close();
+  } catch (err) {
+    console.error(`Failed to close database: ${err.message}`);
+  }
 }
 
 export function updatePlaylistEntries(playlistId, entriesToAdd, entriesToUpdate, entriesToDelete) {
