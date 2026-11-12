@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---------- Stage 1: client build ----------
-FROM node:25-slim AS client
+FROM node:25-alpine AS client
 WORKDIR /client
 
 COPY ./client/package.json ./client/package-lock.json ./
@@ -11,14 +11,14 @@ COPY ./client/ ./
 RUN npm run build
 
 # ---------- Stage 2: server install ----------
-FROM node:25-slim AS server
+FROM node:25-alpine AS server
 WORKDIR /server
 
 COPY ./server/package.json ./server/package-lock.json ./
-RUN npm ci
+RUN npm ci --omit=dev
 
 # ---------- Stage 3: final runtime ----------
-FROM node:25-slim
+FROM node:25-alpine
 
 WORKDIR /app/client
 COPY --from=client /client/dist/ ./dist/
