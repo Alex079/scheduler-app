@@ -16,7 +16,12 @@ startEventScheduler();
 startPlaylistScheduler();
 
 const PORT = process.env.APP_PORT || 3000;
-const staticPath = resolve(fileURLToPath(import.meta.url), '../client/dist');
+// import.meta.url resolves to "file:///app/server/server.js" inside the container,
+// so the parent of that directory is /app. Resolving ../client/dist from the file
+// itself (via its parent dir) would wrongly skip /app and point at the nonexistent
+// /app/server/client/dist; resolve from the parent dir instead so the built client
+// (copied to /app/client) is actually served.
+const staticPath = resolve(import.meta.dirname, '../client/dist');
 
 function shutdown() {
   console.log('\nShutdown requested: stopping schedulers and closing resources...');

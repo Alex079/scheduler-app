@@ -4,10 +4,7 @@ import { existsSync, mkdirSync } from 'fs';
 import bcrypt from 'bcryptjs';
 import Database from 'better-sqlite3';
 
-// __dirname is unavailable under "type": "module"; derive the module's absolute
-// path from the import meta URL so paths resolve against this file, not cwd.
-const moduleUrl = import.meta.url;
-const DATABASE_DIR = resolve(fileURLToPath(moduleUrl), '../../database');
+const DATABASE_DIR = resolve(import.meta.dirname, '../../database');
 
 // Ensure db directory exists
 if (!existsSync(DATABASE_DIR)) {
