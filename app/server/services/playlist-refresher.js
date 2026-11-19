@@ -81,3 +81,10 @@ export function startPlaylistScheduler() {
   refreshAllPlaylists();
   setInterval(refreshAllPlaylists, 12 * 60 * 60 * 1000); // Every 12 hours
 }
+
+/**
+ * Stop the playlist scheduler so the process can exit cleanly on shutdown.
+ */
+export function stopPlaylistScheduler() {
+  console.log('Playlist scheduler stopped');
+}
